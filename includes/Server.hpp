@@ -28,7 +28,7 @@ class Server
         Server(Server const &copy);
 	    Server &operator=(Server const &src);
 
-        void serverinit();
+        void serverInit();
         void createSocket();
         void acceptClient();
         void newClientData(int clientFd);

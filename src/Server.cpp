@@ -1,5 +1,7 @@
 #include "../includes/Server.hpp"
 
+bool Server::_signal = false;
+
 Server::Server(void) 
 {
     this->_socketFd = -1;
@@ -24,8 +26,50 @@ Server &Server::operator=(Server const &src){
     }
 	this->_port = src._port;
 	this->_socketFd = src._socketFd;
-	this->password = src.password;
 	this->_clientList = src._clientList;
 	this->_fds = src._fds;
 	return (*this);
+}
+
+void Server::ClearClients(int clientFd)
+{
+	for (int i = 0; i < this->_fds.size(); i++)
+    {
+		if (this->_fds[i].fd == clientFd)
+		{
+            this->_fds.erase(this->_fds.begin() + i); 
+            break;
+        }
+	}
+	for (size_t i = 0; i < this->_clientList.size(); i++)
+    {
+		if (this->_clientList[i].getFd() == clientFd)
+		{
+            this->_clientList.erase(this->_clientList.begin() + i); 
+            break;
+        }
+	}
+
+}
+
+void Server::handleSignal(int signum)
+{
+	(void)signum;
+	std::cout << std::endl << "Signal Received!" << std::endl;
+	Server::_signal = true;
+}
+
+void Server::createSocket()
+{
+	struct sockaddr_in address;
+	struct pollfd newPoll;
+	address.sin_family = AF_INET
+	address.sin_port = htons(this->_port);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
+	if (this->_socketFd == -1)
+	{
+		throw(std::runtime_error("faild to create socket"));
+	}
 }
