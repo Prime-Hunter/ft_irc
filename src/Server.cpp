@@ -118,5 +118,27 @@ void Server::serverInit(void)
     this->createSocket();
     std::cout << "Server initialized successfully !" << std::endl;
     std::cout << "Waiting for client connection ..." << std::endl;
+
+	while (Server::_signal == false)
+	{
+		if (poll(&this->_fds[0], this->_fds.size(), -1) == -1 && Server::_signal == false)
+		{
+			throw(std::runtime_error("poll function failed"));
+		}
+		for(size_t i = 0; i < this->_fds.size(); i++)
+		{
+			if (this->_fds[i].revents & POLLIN)
+			{
+				if (this->_fds[i].fd == this->_socketFd)
+				{
+					this->acceptClient();
+				}
+				else
+				{
+					this->newClientData(this->_fds[i].fd);
+				}
+			}
+		}
+	}
 }
 
