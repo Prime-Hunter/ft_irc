@@ -13,6 +13,8 @@
 #include <csignal>
 #include "Client.hpp"
 
+#define SERV_PORT 4444;
+
 class Server
 {
     private:

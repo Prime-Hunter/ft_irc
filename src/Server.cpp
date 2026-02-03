@@ -33,7 +33,7 @@ Server &Server::operator=(Server const &src){
 
 void Server::clearClient(int clientFd)
 {
-	for (int i = 0; i < this->_fds.size(); i++)
+	for (size_t i = 0; i < this->_fds.size(); i++)
     {
 		if (this->_fds[i].fd == clientFd)
 		{
@@ -52,6 +52,20 @@ void Server::clearClient(int clientFd)
 
 }
 
+void Server::closeFds(void)
+{
+    for (size_t i =0 ; i < this->_clientList.size(); i++)
+    {
+        std::cout << this->_clientList[i].getFd() << " disconnected" << std::endl;
+        close(this->_clientList[i].getFd());
+    }
+    if (this->_socketFd != -1)
+    {
+        std::cout << "Server " << this->_socketFd << " disconnected" << std::endl;
+        close(this->_socketFd);
+    }
+}
+
 void Server::handleSignal(int signum)
 {
 	(void)signum;
@@ -59,7 +73,7 @@ void Server::handleSignal(int signum)
 	Server::_signal = true;
 }
 
-void Server::createSocket()
+void Server::createSocket(void)
 {
 	struct sockaddr_in address;
 	struct pollfd newPoll;
@@ -74,21 +88,21 @@ void Server::createSocket()
 	}
 
     int val = 1;
-    if (setsockopt(this->_socketFd, SOL_SOCKET, SO_REUSEADDR, &val, val) == -1)
+    if (setsockopt(this->_socketFd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) == -1)
     {
-        throw(std::runtime_error("Could not set SO_REUSEADDR option on server socket\n"));
+        throw(std::runtime_error("Could not set SO_REUSEADDR option on server socket"));
     }
     if (fcntl(this->_socketFd, F_SETFL, O_NONBLOCK) == -1)
     {
-        throw(std::runtime_error("Could not set O_NONBLOCK option on server socket\n"));
+        throw(std::runtime_error("Could not set O_NONBLOCK option on server socket"));
     }
     if (bind(this->_socketFd, (struct sockaddr *) &address, sizeof(address)) == -1)
     {
-        throw(std::runtime_error("Could not bind socket address to server socket\n"));
+        throw(std::runtime_error("Could not bind socket address to server socket"));
     }
     if (listen(this->_socketFd, SOMAXCONN) == -1)
     {
-        throw(std::runtime_error("Could not set server socket to passive\n"));
+        throw(std::runtime_error("Could not set server socket to passive"));
     }
 
     newPoll.fd = this->_socketFd;
@@ -96,3 +110,13 @@ void Server::createSocket()
     newPoll.revents = 0;
     this->_fds.push_back(newPoll);
 }
+
+void Server::serverInit(void)
+{
+    std::cout << "Initializing server ..." << std::endl;
+    this->_port = SERV_PORT;
+    this->createSocket();
+    std::cout << "Server initialized successfully !" << std::endl;
+    std::cout << "Waiting for client connection ..." << std::endl;
+}
+

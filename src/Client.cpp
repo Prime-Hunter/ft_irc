@@ -8,14 +8,14 @@ Client::Client(void)
     std::cout << "Default client constructor called" << std::endl;
 }
 
-Client::Client(std::string nickname, std::string username, int fd) :_fd(fd), _nickname(nickname), _username(username)
+Client::Client(int fd, std::string username, std::string nickname):_fd(fd), _username(username), _nickname(nickname)
 {
     std::cout << "Client construcotr called for " << username << ", fd: " << fd << std::endl;
 }
 
 Client::~Client(void)
 {
-    std::cout << "Client destructor called for " << this->getUsername << std::endl;
+    std::cout << "Client destructor called" << std::endl;
 }
 
 Client::Client(Client const &copy)
@@ -36,3 +36,27 @@ Client &Client::operator=(Client const &src)
 	return (*this);
 }
 
+int Client::getFd(void)
+{
+    return (this->_fd);
+}
+
+std::string Client::getNickname(void)
+{
+    return (this->_nickname);
+}
+
+std::string Client::getUsername(void)
+{
+    return (this->_username);
+}
+
+void Client::setFd(int fd)
+{
+    this->_fd = fd;
+}
+
+void Client::setIpAddress(std::string ipAddress)
+{
+    this->_ipAddress = ipAddress;
+}
