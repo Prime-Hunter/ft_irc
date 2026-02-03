@@ -31,7 +31,7 @@ Server &Server::operator=(Server const &src){
 	return (*this);
 }
 
-void Server::ClearClients(int clientFd)
+void Server::clearClient(int clientFd)
 {
 	for (int i = 0; i < this->_fds.size(); i++)
     {
@@ -63,7 +63,7 @@ void Server::createSocket()
 {
 	struct sockaddr_in address;
 	struct pollfd newPoll;
-	address.sin_family = AF_INET
+	address.sin_family = AF_INET;
 	address.sin_port = htons(this->_port);
 	address.sin_addr.s_addr = INADDR_ANY;
 
@@ -72,4 +72,27 @@ void Server::createSocket()
 	{
 		throw(std::runtime_error("faild to create socket"));
 	}
+
+    int val = 1;
+    if (setsockopt(this->_socketFd, SOL_SOCKET, SO_REUSEADDR, &val, val) == -1)
+    {
+        throw(std::runtime_error("Could not set SO_REUSEADDR option on server socket\n"));
+    }
+    if (fcntl(this->_socketFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        throw(std::runtime_error("Could not set O_NONBLOCK option on server socket\n"));
+    }
+    if (bind(this->_socketFd, (struct sockaddr *) &address, sizeof(address)) == -1)
+    {
+        throw(std::runtime_error("Could not bind socket address to server socket\n"));
+    }
+    if (listen(this->_socketFd, SOMAXCONN) == -1)
+    {
+        throw(std::runtime_error("Could not set server socket to passive\n"));
+    }
+
+    newPoll.fd = this->_socketFd;
+    newPoll.events = POLLIN;
+    newPoll.revents = 0;
+    this->_fds.push_back(newPoll);
 }
