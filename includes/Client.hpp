@@ -33,6 +33,8 @@ class Client
 
         void setFd(int fd);
         void setIpAddress(std::string ipAddress);
+        void setUsername(std::string username);
+        void setNickname(std::string username);
 };
 
 #endif

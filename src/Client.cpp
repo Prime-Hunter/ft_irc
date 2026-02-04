@@ -60,3 +60,13 @@ void Client::setIpAddress(std::string ipAddress)
 {
     this->_ipAddress = ipAddress;
 }
+
+void Client::setUsername(std::string username)
+{
+    this->_username = username;
+}
+
+void Client::setNickname(std::string nickname)
+{
+    this->_nickname = nickname;
+}
