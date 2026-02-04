@@ -84,7 +84,7 @@ void Server::createSocket(void)
 	this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_socketFd == -1)
 	{
-		throw(std::runtime_error("faild to create socket"));
+		throw(std::runtime_error("Unable to create socket"));
 	}
 
     int val = 1;
@@ -111,12 +111,13 @@ void Server::createSocket(void)
     this->_fds.push_back(newPoll);
 }
 
-void Server::serverInit(void)
+void Server::serverInit(int port, std::string password)
 {
     std::cout << "Initializing server ..." << std::endl;
-    this->_port = SERV_PORT;
+    this->_port = port;
+    this->_password = password;
     this->createSocket();
-    std::cout << "Server initialized successfully !" << std::endl;
+    std::cout << "Server initialized successfully ! <PORT " << this->_port << "> <PASSWORD " << this->_password << ">" << std::endl;
     std::cout << "Waiting for client connection ..." << std::endl;
 
 	while (Server::_signal == false)

@@ -12,15 +12,18 @@
 #include <poll.h>
 #include <csignal>
 #include <string.h>
+#include <sstream>
+#include <string>
+#include <cstdlib>
 #include "Client.hpp"
 
-#define SERV_PORT 4444;
 #define BUFFER_SIZE 1024
 
 class Server
 {
     private:
         int _port;
+        std::string _password;
         int _socketFd;
         static bool _signal;
         std::vector<Client> _clientList;
@@ -32,7 +35,7 @@ class Server
         Server(Server const &copy);
 	    Server &operator=(Server const &src);
 
-        void serverInit();
+        void serverInit(int port, std::string password);
         void createSocket();
         void acceptClient();
         void newClientData(int clientFd);
