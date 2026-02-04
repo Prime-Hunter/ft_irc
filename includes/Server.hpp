@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <csignal>
+#include <string.h>
 #include "Client.hpp"
 
 #define SERV_PORT 4444;
