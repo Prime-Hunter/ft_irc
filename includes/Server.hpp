@@ -14,6 +14,7 @@
 #include "Client.hpp"
 
 #define SERV_PORT 4444;
+#define BUFFER_SIZE 1024
 
 class Server
 {
