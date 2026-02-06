@@ -19,7 +19,7 @@ UP                      =       \033[A
 CUT                     =       \033[K
 
 #source files
-SRC_FILES       =       main.cpp Client.cpp Server.cpp
+SRC_FILES       =       main.cpp Client.cpp Server.cpp Authentification.cpp
 
 OBJ_FILES       =       $(SRC_FILES:.cpp=.o)
 
