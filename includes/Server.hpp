@@ -39,6 +39,8 @@ class Server
         void createSocket();
 
         void authClient(Client *client, char *buffer);
+        void setClientUsername(Client *client, char *buffer);
+        void setClientNickname(Client *client, char *buffer);
         void acceptClient();
         void newClientData(int clientFd);
 

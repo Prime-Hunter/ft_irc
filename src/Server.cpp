@@ -146,7 +146,19 @@ void Server::newClientData(int fd)
     Client *client = this->getClient(fd);
     size_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
-    if (client->getLogin())
+    if (!client->getLogin())
+    {
+        this->authClient(client, buffer);
+    }
+    else if (!client->getUsername().compare(""))
+    {
+        this->setClientUsername(client, buffer);
+    }
+    else if (!client->getNickname().compare(""))
+    {
+        this->setClientNickname(client, buffer);
+    }
+    else
     {
         if (bytes > 0)
         {
@@ -159,10 +171,6 @@ void Server::newClientData(int fd)
             this->clearClient(fd);
             close(fd);
         }
-    }
-    else
-    {
-        this->authClient(client, buffer);
     }
 }
 
