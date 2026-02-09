@@ -143,18 +143,35 @@ void Server::newClientData(int fd)
 {
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, sizeof(buffer));
-
+    Client *client = this->getClient(fd);
     size_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
-    if (bytes > 0)
+    if (client->getLogin())
     {
-        buffer[bytes] = '\0';
-        std::cout << "Client <" << fd << ">: " << buffer << std::endl;
+        if (bytes > 0)
+        {
+            buffer[bytes] = '\0';
+            std::cout << "Client <" << fd << ">: " << buffer;
+        }
+        else
+        {
+            std::cout << "Client <" << fd << "> disconnected !" << std::endl;
+            this->clearClient(fd);
+            close(fd);
+        }
     }
     else
     {
-        std::cout << " Client <" << fd << "> disconnected !" << std::endl;
-        this->clearClient(fd);
-        close(fd);
+        this->authClient(client, buffer);
     }
+}
+
+Client *Server::getClient(int fd)
+{
+    for (size_t i =0 ; i < this->_clientList.size(); i++)
+    {
+        if (this->_clientList[i].getFd() == fd)
+            return (&this->_clientList[i]);
+    }
+    return (NULL);
 }

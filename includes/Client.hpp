@@ -16,6 +16,7 @@ class Client
 {
     private:
         int _fd;
+        int _login;
         std::string _ipAddress;
         std::string _username;
         std::string _nickname;
@@ -28,6 +29,7 @@ class Client
         Client &operator =(const Client &src);
 
         int getFd(void);
+        int getLogin(void);
         std::string getUsername(void);
         std::string getNickname(void);
 
@@ -35,6 +37,7 @@ class Client
         void setIpAddress(std::string ipAddress);
         void setUsername(std::string username);
         void setNickname(std::string username);
+        void logIn();
 };
 
 #endif

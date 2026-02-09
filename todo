@@ -1,4 +1,3 @@
-- Demander le mot de passe pour se connecter, utiliser la fonction send() pour communiquer avec le client
 - Ajouter les nickname/username aux clients pour qu'ils puissent s'identifier
 - Creer une classe channel pour les canaux de discussions (prives et publics)
 - Ajouter les commandes (KICK, INVITE ...)
