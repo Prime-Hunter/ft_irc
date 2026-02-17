@@ -139,6 +139,25 @@ void Server::serverInit(int port, std::string password)
 	}
 }
 
+static std::vector<std::string> ft_split(const std::string& str) {
+    std::vector<std::string> tokens;
+    std::istringstream iss(str);
+    std::string token;
+    
+    while (iss >> token) {
+        tokens.push_back(token);
+    }
+    
+    return tokens;
+}
+
+static Command create_cmd(std::string line, int fd)
+{
+    std::vector<std::string> split_line = ft_split(line);
+    Command cmd(split_line[0], split_line, fd);
+    return cmd;
+}
+
 static std::string removeNewline(char *buffer)
 {
     std::string newStr(buffer);
@@ -158,23 +177,28 @@ void Server::newClientData(int fd)
     size_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
     std::string newBuffer = removeNewline(buffer);
 
-    if (client->getLogin())
+    if (bytes > 0)
     {
-        if (bytes > 0)
+        if (newBuffer[0] == '/')
         {
-            buffer[bytes] = '\0';
-            std::cout << "Client <" << fd << ">: " << buffer;
+            Command cmd = create_cmd(newBuffer, fd);
+            cmd.displayCmd();
+        }
+        else if (client->getLogin())
+        {
+           buffer[bytes] = '\0';
+            std::cout << "Client <" << client->getFd() << ">: " << newBuffer << "\n"; 
         }
         else
         {
-            std::cout << "Client <" << fd << "> disconnected !" << std::endl;
-            this->clearClient(fd);
-            close(fd);
+            send(fd, "You must authenticate first !\n", sizeof("You must authenticate first !\n"), 0);
         }
     }
     else
     {
-        this->authClient(client, newBuffer);
+        std::cout << "Client <" << client->getFd() << "> disconnected !" << std::endl;
+        this->clearClient(fd);
+        close(fd);
     }
 }
 
@@ -186,4 +210,33 @@ Client *Server::getClient(int fd)
             return (&this->_clientList[i]);
     }
     return (NULL);
+}
+
+void Server::acceptClient()
+{
+    Client client;
+    struct sockaddr_in clientAddress;
+    struct pollfd newPoll;
+    socklen_t size = sizeof(clientAddress);
+
+    int requestFd = accept(this->_socketFd, (struct sockaddr *) &(clientAddress), &size);
+    if (requestFd == -1)
+    {
+        std::cerr << "Failed to accept new client" << std::endl;
+        return ;
+    }
+    if (fcntl(requestFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        throw(std::runtime_error("Could not set O_NONBLOCK option on server acceptation request"));
+    }
+    send(requestFd, "Welcome to IRC !\n", sizeof("Welcome to IRC !\n") - 1, 0);
+    newPoll.fd = requestFd;
+    newPoll.events = POLLIN;
+    newPoll.revents = 0;
+
+    client.setFd(requestFd);
+    client.setIpAddress(inet_ntoa(clientAddress.sin_addr));
+    this->_clientList.push_back(client);
+    this->_fds.push_back(newPoll);
+    std::cout << "Client " << requestFd << " connected !" << std::endl;
 }

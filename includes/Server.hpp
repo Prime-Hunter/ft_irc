@@ -15,7 +15,9 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <cstdio>
 #include "Client.hpp"
+#include "Command.hpp"
 
 #define BUFFER_SIZE 1024
 
@@ -38,7 +40,6 @@ class Server
         void serverInit(int port, std::string password);
         void createSocket();
 
-        void authClient(Client *client, std::string buffer);
         void acceptClient();
         void newClientData(int clientFd);
 
