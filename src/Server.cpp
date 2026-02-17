@@ -139,12 +139,24 @@ void Server::serverInit(int port, std::string password)
 	}
 }
 
+static std::string removeNewline(char *buffer)
+{
+    std::string newStr(buffer);
+    size_t last_index = newStr.size() - 1;
+    if (newStr[last_index] == '\n')
+    {
+        newStr.erase(last_index);
+    }
+    return (newStr);
+}
+
 void Server::newClientData(int fd)
 {
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, sizeof(buffer));
     Client *client = this->getClient(fd);
     size_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    std::string newBuffer = removeNewline(buffer);
 
     if (client->getLogin())
     {
@@ -162,13 +174,13 @@ void Server::newClientData(int fd)
     }
     else
     {
-        this->authClient(client, buffer);
+        this->authClient(client, newBuffer);
     }
 }
 
 Client *Server::getClient(int fd)
 {
-    for (size_t i =0 ; i < this->_clientList.size(); i++)
+    for (size_t i = 0 ; i < this->_clientList.size(); i++)
     {
         if (this->_clientList[i].getFd() == fd)
             return (&this->_clientList[i]);

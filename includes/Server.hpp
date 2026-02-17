@@ -38,7 +38,7 @@ class Server
         void serverInit(int port, std::string password);
         void createSocket();
 
-        void authClient(Client *client, char *buffer);
+        void authClient(Client *client, std::string buffer);
         void acceptClient();
         void newClientData(int clientFd);
 

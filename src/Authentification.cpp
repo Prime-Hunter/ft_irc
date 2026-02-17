@@ -29,9 +29,9 @@ void Server::acceptClient()
     std::cout << "Client " << requestFd << " connected !" << std::endl;
 }
 
-void Server::authClient(Client *client, char *buffer)
+void Server::authClient(Client *client, std::string buffer)
 {
-    if (!(this->_password.compare(buffer) + 1))
+    if (!(this->_password.compare(buffer)))
     {
         client->logIn();
         send(client->getFd(), "Correct password. you are now logged in !\n", sizeof("Correct password. you are now logged in !\n"), 0);
