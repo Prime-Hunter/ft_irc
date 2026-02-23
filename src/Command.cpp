@@ -2,7 +2,7 @@
 
 Command::Command() {}
 Command::~Command() {}
-Command::Command(std::string name, std::vector<std::string> args, int target): _name(name), _args(args), _targetfd(target) {};
+Command::Command(std::string name, std::vector<std::string> args, int target, std::string *pword, std::vector<Client> *list): _name(name), _args(args), _targetfd(target), _password(pword), _clientList(list) {};
 
 void Command::displayCmd()
 {

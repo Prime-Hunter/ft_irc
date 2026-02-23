@@ -27,6 +27,16 @@ Server &Server::operator=(Server const &src){
 	return (*this);
 }
 
+std::string *Server::getPword(void)
+{
+    return (&this->_password);
+}
+
+std::vector<Client> *Server::getList(void)
+{
+    return (&this->_clientList);
+}
+
 void Server::clearClient(int clientFd)
 {
 	for (size_t i = 0; i < this->_fds.size(); i++)
@@ -151,10 +161,10 @@ static std::vector<std::string> ft_split(const std::string& str) {
     return tokens;
 }
 
-static Command create_cmd(std::string line, int fd)
+static Command create_cmd(std::string line, int fd, std::string *pword, std::vector<Client> *list)
 {
     std::vector<std::string> split_line = ft_split(line);
-    Command cmd(split_line[0], split_line, fd);
+    Command cmd(split_line[0], split_line, fd, pword, list);
     return cmd;
 }
 
@@ -181,7 +191,7 @@ void Server::newClientData(int fd)
     {
         if (newBuffer[0] == '/')
         {
-            Command cmd = create_cmd(newBuffer, fd);
+            Command cmd = create_cmd(newBuffer, fd, this->getPword(), this->getList());
             cmd.displayCmd();
         }
         else if (client->getLogin())

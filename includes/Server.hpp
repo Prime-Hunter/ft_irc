@@ -48,6 +48,9 @@ class Server
         void closeFds();
         void clearClient(int clientFd);
         Client *getClient(int fd);
+
+        std::string *getPword(void);
+        std::vector<Client> *getList(void);
 };
 
 #endif
