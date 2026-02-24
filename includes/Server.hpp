@@ -1,5 +1,4 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#pragma once 
 
 #include <iostream>
 #include <vector>
@@ -17,7 +16,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include "Client.hpp"
-#include "Command.hpp"
 
 #define BUFFER_SIZE 1024
 
@@ -52,5 +50,3 @@ class Server
         std::string *getPword(void);
         std::vector<Client> *getList(void);
 };
-
-#endif

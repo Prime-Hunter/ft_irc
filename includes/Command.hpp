@@ -9,18 +9,17 @@ class Command
         std::string _name;
         std::vector<std::string> _args;
         int _targetfd;
-        std::string *_password;
-        std::vector<Client> *_clientList;
+        Server *_serv;
 
     public:
         Command();
-        Command(std::string name, std::vector<std::string> args, int targetfd, std::string *pword, std::vector<Client> *list);
+        Command(std::string name, std::vector<std::string> args, int targetfd, Server *serv);
         ~Command();
 
-        void displayCmd();
-        void execCmd();
+        void displayCmd(void);
+        void execCmd(void);
 
-        void pass();
+        void pass(void);
 };
 
 #endif

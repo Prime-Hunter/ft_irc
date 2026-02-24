@@ -1,4 +1,5 @@
 #include "../includes/Server.hpp"
+#include "../includes/Command.hpp"
 
 bool Server::_signal = false;
 
@@ -161,10 +162,10 @@ static std::vector<std::string> ft_split(const std::string& str) {
     return tokens;
 }
 
-static Command create_cmd(std::string line, int fd, std::string *pword, std::vector<Client> *list)
+static Command create_cmd(std::string line, int fd, Server *server)
 {
     std::vector<std::string> split_line = ft_split(line);
-    Command cmd(split_line[0], split_line, fd, pword, list);
+    Command cmd(split_line[0], split_line, fd, server);
     return cmd;
 }
 
@@ -191,7 +192,7 @@ void Server::newClientData(int fd)
     {
         if (newBuffer[0] == '/')
         {
-            Command cmd = create_cmd(newBuffer, fd, this->getPword(), this->getList());
+            Command cmd = create_cmd(newBuffer, fd, this);
             cmd.displayCmd();
         }
         else if (client->getLogin())
