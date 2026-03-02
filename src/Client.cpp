@@ -1,4 +1,5 @@
 #include "../includes/Client.hpp"
+#include <sys/socket.h>
 
 Client::Client(void)
 {
@@ -77,4 +78,5 @@ void Client::setNickname(std::string nickname)
 void Client::logIn()
 {
     this->_login = 1;
+    send(this->getFd(), "You are now logged in !\n", sizeof("You are now logged in !\n"), 0);
 }

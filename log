@@ -1,0 +1,18 @@
+{
+    Welcome to IRC !
+    /pass
+    Error: Incorrect Argument Number
+    /pass irctest
+    Error: Incorrect Password
+    /pass ""   
+    Error: Incorrect Password
+    /pass irc42
+    You must authenticate first !
+    /pass irc42
+    You are now logged in !
+    /pass irc42
+    Error: You are already logged in
+    /pass irc42
+    Error: You are already logged in 
+}
+

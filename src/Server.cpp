@@ -162,10 +162,10 @@ static std::vector<std::string> ft_split(const std::string& str) {
     return tokens;
 }
 
-static Command create_cmd(std::string line, int fd, Server *server)
+static Command create_cmd(std::string line, Client *target, Server *server)
 {
     std::vector<std::string> split_line = ft_split(line);
-    Command cmd(split_line[0], split_line, fd, server);
+    Command cmd(split_line[0], split_line, target, server);
     return cmd;
 }
 
@@ -192,8 +192,18 @@ void Server::newClientData(int fd)
     {
         if (newBuffer[0] == '/')
         {
-            Command cmd = create_cmd(newBuffer, fd, this);
-            cmd.displayCmd();
+            Command cmd = create_cmd(newBuffer, client, this);
+            // cmd.displayCmd();
+            try
+            {
+                cmd.execCmd();
+            }
+            catch(const std::exception& e)
+            {
+                send(fd, "Error: ", sizeof("Error: "), 0);
+                send(fd, e.what(), strlen(e.what()), 0);
+                send(fd, "\n", 1, 0);
+            }
         }
         else if (client->getLogin())
         {

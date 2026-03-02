@@ -4,22 +4,22 @@ void Command::pass(void)
 {
     if (this->_args.size() != 2)
     {
-        return ;
+        throw Command::IncorrectArgNumber();
     }
     if (this->_args[1].empty())
     {
-        return ;
+        throw Command::EmptyArg();
     }
-    if (target.getLogin())
+    if (this->_target->getLogin())
     {
-        return ;
+        throw Command::UserAlreadyLogged();
     }
-    if (this->_args[1].compare(this->_serv;getPword()))
+    if (this->_args[1] == *this->_serv->getPword())
     {
-        this->_target.logIn();
+        this->_target->logIn();
     }
     else
     {
-        return ;
+        throw Command::IncorrectPassword();
     }
 }
