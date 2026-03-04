@@ -20,6 +20,8 @@ class Command
         void execCmd(void);
 
         void pass(void);
+        void user(void);
+        void nick(void);
 
     class UnknownCmd: public std::exception
     {
@@ -39,7 +41,31 @@ class Command
             virtual const char *what() const throw();
     };
 
+    class UserNotLogged: public std::exception
+    {
+        public:
+            virtual const char *what() const throw();
+    };
+
     class UserAlreadyLogged: public std::exception
+    {
+        public:
+            virtual const char *what() const throw();
+    };
+
+    class UsernameNotSet: public std::exception
+    {
+        public:
+            virtual const char *what() const throw();
+    };
+
+    class UsernameSet: public std::exception
+    {
+        public:
+            virtual const char *what() const throw();
+    };
+
+    class NicknameSet: public std::exception
     {
         public:
             virtual const char *what() const throw();

@@ -17,6 +17,7 @@ class Client
     private:
         int _fd;
         int _login;
+        int _write;
         std::string _ipAddress;
         std::string _username;
         std::string _nickname;
@@ -32,12 +33,14 @@ class Client
         int getLogin(void);
         std::string getUsername(void);
         std::string getNickname(void);
+        int getWrite(void);
 
         void setFd(int fd);
         void setIpAddress(std::string ipAddress);
         void setUsername(std::string username);
         void setNickname(std::string username);
-        void logIn();
+        void logIn(void);
+        void checkAuth(void);
 };
 
 #endif

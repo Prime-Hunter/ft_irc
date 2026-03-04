@@ -205,7 +205,7 @@ void Server::newClientData(int fd)
                 send(fd, "\n", 1, 0);
             }
         }
-        else if (client->getLogin())
+        else if (client->getWrite())
         {
            buffer[bytes] = '\0';
             std::cout << "Client <" << client->getFd() << ">: " << newBuffer << "\n"; 

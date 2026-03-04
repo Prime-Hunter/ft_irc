@@ -24,11 +24,11 @@ void Command::execCmd(void)
     }
     else if (!this->_name.compare("/user"))
     {
-        std::cout << "Username cmd" << std::endl;
+        this->user();
     }
     else if (!this->_name.compare("/nick"))
     {
-        std::cout << "Nickname cmd" << std::endl;
+        this->nick();
     }
     else
     {
@@ -51,9 +51,29 @@ const char *Command::EmptyArg::what(void) const throw()
     return ("Empty Argument");
 };
 
+const char *Command::UserNotLogged::what(void) const throw()
+{
+    return ("You have not enter password yet");
+};
+
 const char *Command::UserAlreadyLogged::what(void) const throw()
 {
     return ("You are already logged in");
+};
+
+const char *Command::UsernameNotSet::what(void) const throw()
+{
+    return ("You have not set your username yet");
+};
+
+const char *Command::UsernameSet::what(void) const throw()
+{
+    return ("Username Already Set");
+};
+
+const char *Command::NicknameSet::what(void) const throw()
+{
+    return ("Nickname Already Set");
 };
 
 const char *Command::IncorrectPassword::what(void) const throw()

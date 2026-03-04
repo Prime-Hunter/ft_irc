@@ -7,11 +7,13 @@ Client::Client(void)
 	this->_username = "";
 	this->_fd = -1;
     this->_login = 0;
+    this->_write = 0;
 }
 
 Client::Client(int fd, std::string username, std::string nickname):_fd(fd), _username(username), _nickname(nickname)
 {
     this->_login = 0;
+    this->_write = 0;
 }
 
 Client::~Client(void)
@@ -32,6 +34,7 @@ Client &Client::operator=(Client const &src)
 	this->_username = src._username;
 	this->_fd = src._fd;
     this->_login = src._login;
+    this->_write = src._write;
 	return (*this);
 }
 
@@ -55,6 +58,11 @@ std::string Client::getUsername(void)
     return (this->_username);
 }
 
+int Client::getWrite(void)
+{
+    return (this->_write);
+}
+
 void Client::setFd(int fd)
 {
     this->_fd = fd;
@@ -75,8 +83,16 @@ void Client::setNickname(std::string nickname)
     this->_nickname = nickname;
 }
 
-void Client::logIn()
+void Client::logIn(void)
 {
     this->_login = 1;
     send(this->getFd(), "You are now logged in !\n", sizeof("You are now logged in !\n"), 0);
+}
+
+void Client::checkAuth(void)
+{
+    if (this->getLogin() && !this->getUsername().empty() && !this->getNickname().empty())
+    {
+        this->_write = 1;
+    }
 }
