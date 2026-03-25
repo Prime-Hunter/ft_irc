@@ -16,7 +16,7 @@ class Channel
         std::string _key;
         int _inviteOnly;
         int _secured;
-
+        int _connectedCount;
 
     public:
         Channel();
@@ -26,6 +26,7 @@ class Channel
         const std::string getName() const;
         const std::string getTopic() const;
         const std::string getKey() const;
+        int getClientCount() const;
         int isInviteOnly() const;
         int isRestricted() const;
         

@@ -34,6 +34,10 @@ void Command::execCmd(void)
     {
         this->join();
     }
+    else if (!this->_name.compare("/part"))
+    {
+        this->part();
+    }
     else
     {
         throw Command::UnknownCmd();
@@ -83,4 +87,9 @@ const char *Command::NicknameSet::what(void) const throw()
 const char *Command::IncorrectPassword::what(void) const throw()
 {
     return ("Incorrect Password");
+};
+
+const char *Command::InvalidChannel::what(void) const throw()
+{
+    return ("Invalid Channel");
 };

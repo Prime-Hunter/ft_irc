@@ -31,7 +31,6 @@ void Command::join()
     else
     {
         Channel newChannel(channelName);
-        newChannel.addMember(_target);
         newChannel.addOperator(_target);
         channels->push_back(newChannel);
     }

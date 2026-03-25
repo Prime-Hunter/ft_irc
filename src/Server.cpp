@@ -193,7 +193,6 @@ void Server::newClientData(int fd)
         if (newBuffer[0] == '/')
         {
             Command cmd = create_cmd(newBuffer, client, this);
-            // cmd.displayCmd();
             try
             {
                 cmd.execCmd();

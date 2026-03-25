@@ -22,7 +22,8 @@ class Command
         void pass(void);
         void user(void);
         void nick(void);
-        void join();
+        void join(void);
+        void part(void);
 
     class UnknownCmd: public std::exception
     {
@@ -73,6 +74,12 @@ class Command
     };
 
     class IncorrectPassword: public std::exception
+    {
+        public:
+            virtual const char *what() const throw();
+    };
+
+    class InvalidChannel: public std::exception
     {
         public:
             virtual const char *what() const throw();
