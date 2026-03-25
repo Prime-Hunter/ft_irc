@@ -207,7 +207,7 @@ void Server::newClientData(int fd)
         }
         else if (client->getWrite())
         {
-           buffer[bytes] = '\0';
+            buffer[bytes] = '\0';
             std::cout << "Client <" << client->getFd() << ">: " << newBuffer << "\n"; 
         }
         else

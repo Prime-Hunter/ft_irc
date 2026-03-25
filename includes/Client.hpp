@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <csignal>
+#include "Channel.hpp"
 
 class Client
 {
@@ -21,6 +22,7 @@ class Client
         std::string _ipAddress;
         std::string _username;
         std::string _nickname;
+        Channel *_currentChannel;
     
     public:
         Client(void);
