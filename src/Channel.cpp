@@ -1,5 +1,6 @@
 #include "../includes/Channel.hpp"
 #include <algorithm>
+#include <iostream>
 
 Channel::Channel(): _name("unknown"), _topic(""), _inviteOnly(0) , _secured(0) {}
 

@@ -261,3 +261,8 @@ void Server::acceptClient()
     this->_fds.push_back(newPoll);
     std::cout << "Client " << requestFd << " connected !" << std::endl;
 }
+
+std::vector<Channel> *Server::getChannels(void)
+{
+    return (&this->_channelList);
+}

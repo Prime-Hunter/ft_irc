@@ -30,6 +30,10 @@ void Command::execCmd(void)
     {
         this->nick();
     }
+    else if (!this->_name.compare("/join"))
+    {
+        this->join();
+    }
     else
     {
         throw Command::UnknownCmd();

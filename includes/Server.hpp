@@ -15,7 +15,11 @@
 #include <string>
 #include <cstdlib>
 #include <cstdio>
+#include <algorithm>
 #include "Client.hpp"
+#include "Channel.hpp"
+
+class Channel;
 
 #define BUFFER_SIZE 1024
 
@@ -28,6 +32,7 @@ class Server
         static bool _signal;
         std::vector<Client> _clientList;
         std::vector<struct pollfd> _fds;
+        std::vector<Channel> _channelList;
     
     public:
         Server();
@@ -49,4 +54,5 @@ class Server
 
         std::string *getPword(void);
         std::vector<Client> *getList(void);
+        std::vector<Channel> *getChannels(void);
 };

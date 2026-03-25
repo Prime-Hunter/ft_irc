@@ -22,6 +22,7 @@ class Command
         void pass(void);
         void user(void);
         void nick(void);
+        void join();
 
     class UnknownCmd: public std::exception
     {

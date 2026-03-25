@@ -22,7 +22,6 @@ class Client
         std::string _ipAddress;
         std::string _username;
         std::string _nickname;
-        Channel *_currentChannel;
     
     public:
         Client(void);
