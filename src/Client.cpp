@@ -16,13 +16,9 @@ Client::Client(int fd, std::string username, std::string nickname):_fd(fd), _use
     this->_write = 0;
 }
 
-Client::~Client(void)
-{}
+Client::~Client(void) {}
 
-Client::Client(Client const &copy)
-{
-    *this = copy;
-}
+Client::Client(Client const &copy) {*this = copy;}
 
 Client &Client::operator=(Client const &src)
 {
@@ -38,50 +34,27 @@ Client &Client::operator=(Client const &src)
 	return (*this);
 }
 
-int Client::getFd(void)
-{
-    return (this->_fd);
-}
+int Client::getFd(void) {return (this->_fd);}
 
-int Client::getLogin(void)
-{
-    return (this->_login);
-}
+int Client::getLogin(void) {return (this->_login);}
 
-std::string Client::getNickname(void)
-{
-    return (this->_nickname);
-}
+std::string Client::getNickname(void){return (this->_nickname);}
 
-std::string Client::getUsername(void)
-{
-    return (this->_username);
-}
+std::string Client::getUsername(void) {return (this->_username);}
 
-int Client::getWrite(void)
-{
-    return (this->_write);
-}
+int Client::getWrite(void) {return (this->_write);}
 
-void Client::setFd(int fd)
-{
-    this->_fd = fd;
-}
+Channel Client::getChannel(void) {return (this->_currentChannel);}
 
-void Client::setIpAddress(std::string ipAddress)
-{
-    this->_ipAddress = ipAddress;
-}
+void Client::setFd(int fd) {this->_fd = fd;}
 
-void Client::setUsername(std::string username)
-{
-    this->_username = username;
-}
+void Client::setIpAddress(std::string ipAddress) {this->_ipAddress = ipAddress;}
 
-void Client::setNickname(std::string nickname)
-{
-    this->_nickname = nickname;
-}
+void Client::setUsername(std::string username) {this->_username = username;}
+
+void Client::setNickname(std::string nickname) {this->_nickname = nickname;}
+
+void Client::setChannel(Channel newChannel) {this->_currentChannel = newChannel;}
 
 void Client::logIn(void)
 {

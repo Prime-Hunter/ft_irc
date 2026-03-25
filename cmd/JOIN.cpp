@@ -27,11 +27,16 @@ void Command::join()
     if (it != channels->end())
     {
         it->addMember(_target);
+        this->_target->setChannel(*it);
     }
     else
     {
         Channel newChannel(channelName);
         newChannel.addOperator(_target);
         channels->push_back(newChannel);
+        this->_target->setChannel(newChannel);
     }
+    send(this->_target->getFd(), "<#", 2, 0);
+    send(this->_target->getFd(), channelName.c_str(), sizeof(channelName.c_str()), 0);
+    send(this->_target->getFd(), ">: ", 3, 0);
 }

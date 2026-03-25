@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iostream>
 
-Channel::Channel(): _name("unknown"), _topic(""), _inviteOnly(0), _secured(0), _connectedCount(0) {}
+Channel::Channel(): _name(""), _topic(""), _inviteOnly(0), _secured(0), _connectedCount(0) {}
 
 Channel::Channel(const std::string &name): _name(name), _topic(""), _inviteOnly(0) , _secured(0), _connectedCount(0){}
 

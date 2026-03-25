@@ -2,7 +2,6 @@
 
 void Command::part()
 {
-    std::cout << "part called" << std::endl;
     if (this->_args.size() != 2)
     {
         throw Command::IncorrectArgNumber();
@@ -21,13 +20,12 @@ void Command::part()
     }
     if (it == channels->end())
     {
-        std::cout << "error channel" << std::endl;
         throw (Command::InvalidChannel());
     }
     it->removeMember(_target);
+    _target->setChannel(Channel());
     if (it->getClientCount() <= 0)
     {
-        std::cout << "Channel deleted" << std::endl;
         channels->erase(it);
     }
 }

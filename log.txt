@@ -1,0 +1,42 @@
+{
+    Welcome to IRC !
+    /pass
+    Error: Incorrect Argument Number
+    /pass irctest
+    Error: Incorrect Password
+    /pass ""   
+    Error: Incorrect Password
+    /pass irc42
+    You must authenticate first !
+    /pass irc42
+    You are now logged in !
+    /pass irc42
+    Error: You are already logged in
+    /pass irc42
+    Error: You are already logged in 
+}
+
+{
+    Welcome to IRC !
+    /pass irc42
+    You are now logged in !
+    /user louis
+    Your username is set !
+    /nick Louis
+    Your nickname is set !
+    /join test
+    <#test>: allo
+    <#test>: ok
+    <#test>: super
+    <#test>: /part test
+    ok
+    yippeeee
+    ca marche bieng
+    /join testleretour
+    <#testlere>: ah?
+    <#testlere>: /part testlere
+    Error: Invalid Channel
+    /part testleretour
+    ok bizarre
+}
+
