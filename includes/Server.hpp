@@ -55,4 +55,5 @@ class Server
         std::string *getPword(void);
         std::vector<Client> *getList(void);
         std::vector<Channel> *getChannels(void);
+
 };

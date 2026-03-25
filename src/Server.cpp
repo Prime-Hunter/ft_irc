@@ -207,13 +207,14 @@ void Server::newClientData(int fd)
         else if (client->getWrite())
         {
             buffer[bytes] = '\0';
-            client->getChannel().sendMessage(newBuffer, *client);
-            //if (!client->getChannel().getName().empty())
-            //{
-            //    send(fd, "<#", 2, 0);
-            //    send(fd, client->getChannel().getName().c_str(), sizeof(client->getChannel().getName().c_str()), 0);
-            //    send(fd, "> ", 2, 0);
-            //}
+            if (client->hasChannel())
+            {
+                client->getChannel().sendMessage(newBuffer, client);
+            }
+            else
+            {
+                send(fd, "You must join a channel first !\n", sizeof("You must join a channel first !\n"), 0);
+            }
         }
         else
         {

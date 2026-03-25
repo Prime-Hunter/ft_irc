@@ -1,5 +1,6 @@
-- Ajouter les nickname/username aux clients pour qu'ils puissent s'identifier
-- Creer une classe channel pour les canaux de discussions (prives et publics)
+- rendre les username uniques
+- implementer imvit only
+
 - Ajouter les commandes (KICK, INVITE ...)
 
 pour se log au serv: 'nc 127.0.0.1 4444' (n'importe quel port entre 1024 et 65535)

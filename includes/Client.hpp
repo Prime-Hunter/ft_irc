@@ -45,6 +45,7 @@ class Client
         void setChannel(Channel *newChannel);
         void logIn(void);
         void checkAuth(void);
+        bool hasChannel(void);
 };
 
 #endif

@@ -65,7 +65,7 @@ int Channel::isMember(Client *client) const
     return (0);
 }
 
-void Channel::sendMessage(std::string mess, Client author)
+void Channel::sendMessage(std::string mess, Client *author)
 {
     std::set<Client*> list;
     for (std::vector<Client*>::iterator it = _connectedClients.begin(); it != _connectedClients.end(); ++it)
@@ -78,12 +78,15 @@ void Channel::sendMessage(std::string mess, Client author)
     }
     for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it)
     {
-        send((*it)->getFd(), "<#", 2, 0);
-        send((*it)->getFd(), this->getName().c_str(), sizeof(this->getName().c_str()), 0);
-        send((*it)->getFd(), " @", 2, 0);
-        send((*it)->getFd(), author.getUsername().c_str(), sizeof(author.getUsername().c_str()), 0);
-        send((*it)->getFd(), ">: ", 3, 0);
-        send((*it)->getFd(), mess.c_str(), mess.size(), 0);
-        send((*it)->getFd(), "\n", 1, 0);
+        if ((*it)->getFd() != author->getFd())
+        {
+            send((*it)->getFd(), "<#", 2, 0);
+            send((*it)->getFd(), this->getName().c_str(), sizeof(this->getName().c_str()), 0);
+            send((*it)->getFd(), " @", 2, 0);
+            send((*it)->getFd(), author->getUsername().c_str(), sizeof(author->getUsername().c_str()), 0);
+            send((*it)->getFd(), ">: ", 3, 0);
+            send((*it)->getFd(), mess.c_str(), mess.size(), 0);
+            send((*it)->getFd(), "\n", 1, 0);
+        }
     }
 }

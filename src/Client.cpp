@@ -77,3 +77,8 @@ void Client::checkAuth(void)
         this->_write = 1;
     }
 }
+
+bool Client::hasChannel(void)
+{
+    return (this->_currentChannel != NULL);
+}
