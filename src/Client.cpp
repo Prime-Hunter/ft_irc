@@ -1,4 +1,5 @@
 #include "../includes/Client.hpp"
+#include "../includes/Replies.hpp"
 #include <sys/socket.h>
 
 Client::Client(void)
@@ -85,7 +86,6 @@ void Client::clearTempBuffer(void){ this->_tempBuffer.clear(); }
 void Client::logIn(void)
 {
     this->_login = 1;
-    send(this->getFd(), "You are now logged in !\n", sizeof("You are now logged in !\n"), 0);
 }
 
 void Client::checkAuth(void)
@@ -93,6 +93,10 @@ void Client::checkAuth(void)
     if (this->getLogin() && !this->getUsername().empty() && !this->getNickname().empty())
     {
         this->_write = 1;
+        send(this->getFd(), IRC::Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).c_str(), IRC::Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).length(), 0);
+        send(this->getFd(), IRC::Reply::yourhost(this->getNickname()).c_str(), IRC::Reply::yourhost(this->getNickname()).length(), 0);
+        send(this->getFd(), IRC::Reply::created(this->getNickname()).c_str(), IRC::Reply::created(this->getNickname()).length(), 0);
+        send(this->getFd(), IRC::Reply::myinfo(this->getNickname()).c_str(), IRC::Reply::myinfo(this->getNickname()).length(), 0);
     }
 }
 

@@ -81,11 +81,11 @@ void Channel::sendMessage(std::string mess, Client *author)
         if ((*it)->getFd() != author->getFd())
         {
             send((*it)->getFd(), "<#", 2, 0);
-            send((*it)->getFd(), this->getName().c_str(), sizeof(this->getName().c_str()), 0);
+            send((*it)->getFd(), this->getName().c_str(), this->getName().length(), 0);
             send((*it)->getFd(), " @", 2, 0);
-            send((*it)->getFd(), author->getUsername().c_str(), sizeof(author->getUsername().c_str()), 0);
+            send((*it)->getFd(), author->getUsername().c_str(), author->getUsername().length(), 0);
             send((*it)->getFd(), ">: ", 3, 0);
-            send((*it)->getFd(), mess.c_str(), mess.size(), 0);
+            send((*it)->getFd(), mess.c_str(), mess.length(), 0);
             send((*it)->getFd(), "\n", 1, 0);
         }
     }

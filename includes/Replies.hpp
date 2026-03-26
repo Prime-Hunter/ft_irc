@@ -4,10 +4,8 @@
 #include <string>
 #include <sstream>
 
-// IRC Reply Codes
 namespace IRC
 {
-    // Numeric Replies
     const int RPL_WELCOME = 001;
     const int RPL_YOURHOST = 002;
     const int RPL_CREATED = 003;
@@ -51,7 +49,6 @@ namespace IRC
     const int ERR_BADCHANNELKEY = 475;
     const int ERR_CHANOPRIVSNEEDED = 482;
 
-    // Helper functions to build IRC replies
     class Reply
     {
         public:

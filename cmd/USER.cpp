@@ -22,5 +22,5 @@ void Command::user(void)
     this->_target->setHostname(this->_args[2]);
     this->_target->setServername(this->_args[3]);
     this->_target->setRealname(this->_args[4]);
-    send(this->_target->getFd(), "Your user info is set!\n", sizeof("Your user info is set!\n"), 0);
+    this->_target->checkAuth();
 }
