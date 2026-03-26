@@ -19,6 +19,8 @@ class Command
 
         void displayCmd(void);
         void execCmd(void);
+        int isAvailableNickname(const std::string &nick);
+        Server *getServ() {return this->_serv;}
 
         void pass(void);
         void user(void);

@@ -1,18 +1,28 @@
 #include "../includes/Command.hpp"
 
-static bool isValidNickname(const std::string &nick)
+static int isValidNickname(const std::string &nick)
 {
     if (nick.empty())
-        return false;
+        return 0;
     if (!std::isalpha(static_cast<unsigned char>(nick[0])))
-        return false;
+        return 0;
     for (size_t i = 0; i < nick.size(); ++i)
     {
         char c = nick[i];
         if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '[' || c == ']' || c == '\\' || c == '`' || c == '^' || c == '{' || c == '}' || c == '|'))
-            return false;
+            return 0;
     }
-    return true;
+    return 1;
+}
+
+int Command::isAvailableNickname(const std::string &nick)
+{
+    std::vector<Client> *list = this->getServ()->getList();
+    for (std::vector<Client>::iterator it = list->begin(); it != list->end(); ++it)
+    {
+        if (it->getNickname() == nick) {return 0;}
+    }
+    return 1;
 }
 
 void Command::nick(void)
@@ -48,6 +58,12 @@ void Command::nick(void)
         std::string message = IRC::Reply::alreadyregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
+    }
+    if (!this->isAvailableNickname(this->_args[1]))
+    {
+        std::string message = IRC::Reply::nicknameinuse(nick);
+        send(this->_target->getFd(), message.c_str(), message.length(), 0);
+        return ;
     }
     std::vector<Client> *clients = this->_serv->getList();
     for (std::vector<Client>::iterator it = clients->begin(); it != clients->end(); ++it)

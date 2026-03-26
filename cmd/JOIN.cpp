@@ -28,8 +28,15 @@ void Command::join()
     }
     if (it != channels->end())
     {
-        it->addMember(_target);
-        this->_target->setChannel(&(*it));
+        if (!it->isInviteOnly())
+        {
+            it->addMember(_target);
+            this->_target->setChannel(&(*it));
+        }
+        else
+        {
+            send(this->_target->getFd(), IRC::Reply::inviteonlychan(this->_target->getNickname(), it->getName()).c_str(), IRC::Reply::inviteonlychan(this->_target->getNickname(), it->getName()).length(), 0);
+        }
     }
     else
     {
