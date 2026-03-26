@@ -1,6 +1,8 @@
-- rendre les username uniques
-- implementer imvit only
+- rendre les nickname uniques
+- implementer invit only
+- transformer sendMessage en PRIVMSG avec la commande adequat
+- implementer QUIT, TOPIC et KICK
+- rajouter les parametres necessaires puis implementer INVITE et MODE
 
-- Ajouter les commandes (KICK, INVITE ...)
-
-pour se log au serv: 'nc 127.0.0.1 4444' (n'importe quel port entre 1024 et 65535)
+pour se log au serv fast: 'nc 127.0.0.1 4444' (n'importe quel port entre 1024 et 65535)
+pour se log depuis irssi: '/connect localhost 4444 irc42'
