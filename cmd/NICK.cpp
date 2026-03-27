@@ -21,37 +21,37 @@ void Command::nick(void)
 
     if (this->_args.size() != 2)
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "NICK");
+        std::string message = Reply::needmoreparams(nick, "NICK");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (this->_args[1].empty())
     {
-        std::string message = IRC::Reply::nonicknamegiven(nick);
+        std::string message = Reply::nonicknamegiven(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!isValidNickname(this->_args[1]))
     {
-        std::string message = IRC::Reply::erroneusnickname(nick);
+        std::string message = Reply::erroneusnickname(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!this->_target->getLogin())
     {
-        std::string message = IRC::Reply::notregistered(nick);
+        std::string message = Reply::notregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!this->_target->getNickname().empty())
     {
-        std::string message = IRC::Reply::alreadyregistered(nick);
+        std::string message = Reply::alreadyregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!this->isAvailableNickname(this->_args[1]))
     {
-        std::string message = IRC::Reply::nicknameinuse(nick);
+        std::string message = Reply::nicknameinuse(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return ;
     }
@@ -60,7 +60,7 @@ void Command::nick(void)
     {
         if (it->getFd() != this->_target->getFd() && it->getNickname() == this->_args[1] && !it->getNickname().empty())
         {
-            std::string message = IRC::Reply::nicknameinuse(this->_args[1]);
+            std::string message = Reply::nicknameinuse(this->_args[1]);
             send(this->_target->getFd(), message.c_str(), message.length(), 0);
             return;
         }

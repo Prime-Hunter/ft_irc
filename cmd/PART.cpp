@@ -6,13 +6,13 @@ void Command::part()
 
     if (this->_args.size() != 2)
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "PART");
+        std::string message = Reply::needmoreparams(nick, "PART");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (this->_args[1].empty())
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "PART");
+        std::string message = Reply::needmoreparams(nick, "PART");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
@@ -26,7 +26,7 @@ void Command::part()
     }
     if (it == channels->end())
     {
-        std::string message = IRC::Reply::nosuchchannel(nick, channelName);
+        std::string message = Reply::nosuchchannel(nick, channelName);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }

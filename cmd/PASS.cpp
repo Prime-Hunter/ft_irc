@@ -6,19 +6,19 @@ void Command::pass(void)
 
     if (this->_args.size() != 2)
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "PASS");
+        std::string message = Reply::needmoreparams(nick, "PASS");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (this->_args[1].empty())
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "PASS");
+        std::string message = Reply::needmoreparams(nick, "PASS");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (this->_target->getLogin())
     {
-        std::string message = IRC::Reply::alreadyregistered(nick);
+        std::string message = Reply::alreadyregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
@@ -28,7 +28,7 @@ void Command::pass(void)
     }
     else
     {
-        std::string message = IRC::Reply::passwdmismatch(nick);
+        std::string message = Reply::passwdmismatch(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
     }
 }

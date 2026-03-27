@@ -6,25 +6,25 @@ void Command::user(void)
 
     if (this->_args.size() != 5)
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "USER");
+        std::string message = Reply::needmoreparams(nick, "USER");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (this->_args[1].empty() || this->_args[2].empty() || this->_args[3].empty() || this->_args[4].empty())
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "USER");
+        std::string message = Reply::needmoreparams(nick, "USER");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!this->_target->getLogin())
     {
-        std::string message = IRC::Reply::notregistered(nick);
+        std::string message = Reply::notregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }
     if (!this->_target->getUsername().empty())
     {
-        std::string message = IRC::Reply::alreadyregistered(nick);
+        std::string message = Reply::alreadyregistered(nick);
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }

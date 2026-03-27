@@ -31,7 +31,6 @@ Channel *Command::getChannel(const std::string &name)
     std::vector<Channel> *list = this->getServ()->getChannels();
     for (std::vector<Channel>::iterator it = list->begin(); it != list->end(); ++it)
     {
-        std::cout << "chan name: " << it->getName() << " | " << name << std::endl; 
         if (it->getName() == name)
             return &(*it);
     }
@@ -88,59 +87,4 @@ void Command::execCmd(void)
 const char *Command::UnknownCmd::what(void) const throw()
 {
     return ("Command Unknown");
-};
-
-const char *Command::IncorrectArgNumber::what(void) const throw()
-{
-    return ("Incorrect Argument Number");
-};
-
-const char *Command::EmptyArg::what(void) const throw()
-{
-    return ("Empty Argument");
-};
-
-const char *Command::UserNotLogged::what(void) const throw()
-{
-    return ("You have not enter password yet");
-};
-
-const char *Command::UserAlreadyLogged::what(void) const throw()
-{
-    return ("You are already logged in");
-};
-
-const char *Command::UsernameNotSet::what(void) const throw()
-{
-    return ("You have not set your username yet");
-};
-
-const char *Command::UsernameSet::what(void) const throw()
-{
-    return ("Username Already Set");
-};
-
-const char *Command::NicknameSet::what(void) const throw()
-{
-    return ("Nickname Already Set");
-};
-
-const char *Command::ErroneusNickname::what(void) const throw()
-{
-    return ("Erroneus nickname");
-};
-
-const char *Command::NicknameInUse::what(void) const throw()
-{
-    return ("Nickname is already in use");
-};
-
-const char *Command::IncorrectPassword::what(void) const throw()
-{
-    return ("Incorrect Password");
-};
-
-const char *Command::InvalidChannel::what(void) const throw()
-{
-    return ("Invalid Channel");
 };

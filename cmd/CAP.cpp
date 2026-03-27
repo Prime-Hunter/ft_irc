@@ -6,7 +6,7 @@ void Command::cap(void)
 
     if (this->_args.size() < 2)
     {
-        std::string message = IRC::Reply::needmoreparams(nick, "CAP");
+        std::string message = Reply::needmoreparams(nick, "CAP");
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return;
     }

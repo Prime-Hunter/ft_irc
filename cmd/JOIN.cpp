@@ -10,12 +10,12 @@ void Command::join()
 {
     if (this->_args.size() != 2)
     {
-        send(this->_target->getFd(), IRC::Reply::needmoreparams(this->_target->getNickname(), this->_name).c_str(), IRC::Reply::nosuchchannel(this->_target->getNickname(), this->_name).length(), 0);
+        send(this->_target->getFd(), Reply::needmoreparams(this->_target->getNickname(), this->_name).c_str(), Reply::nosuchchannel(this->_target->getNickname(), this->_name).length(), 0);
         return;
     }
     if (this->_args[1].empty())
     {
-        send(this->_target->getFd(), IRC::Reply::nosuchchannel(this->_target->getNickname(), "").c_str(), IRC::Reply::nosuchchannel(this->_target->getNickname(), "").length(), 0);
+        send(this->_target->getFd(), Reply::nosuchchannel(this->_target->getNickname(), "").c_str(), Reply::nosuchchannel(this->_target->getNickname(), "").length(), 0);
         return;
     }
     std::string channelName = this->_args[1];
@@ -35,7 +35,7 @@ void Command::join()
         }
         else
         {
-            send(this->_target->getFd(), IRC::Reply::inviteonlychan(this->_target->getNickname(), it->getName()).c_str(), IRC::Reply::inviteonlychan(this->_target->getNickname(), it->getName()).length(), 0);
+            send(this->_target->getFd(), Reply::inviteonlychan(this->_target->getNickname(), it->getName()).c_str(), Reply::inviteonlychan(this->_target->getNickname(), it->getName()).length(), 0);
         }
     }
     else

@@ -93,10 +93,10 @@ void Client::checkAuth(void)
     if (this->getLogin() && !this->getUsername().empty() && !this->getNickname().empty())
     {
         this->_write = 1;
-        send(this->getFd(), IRC::Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).c_str(), IRC::Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).length(), 0);
-        send(this->getFd(), IRC::Reply::yourhost(this->getNickname()).c_str(), IRC::Reply::yourhost(this->getNickname()).length(), 0);
-        send(this->getFd(), IRC::Reply::created(this->getNickname()).c_str(), IRC::Reply::created(this->getNickname()).length(), 0);
-        send(this->getFd(), IRC::Reply::myinfo(this->getNickname()).c_str(), IRC::Reply::myinfo(this->getNickname()).length(), 0);
+        send(this->getFd(), Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).c_str(), Reply::welcome(this->getNickname(), this->getUsername(), this->getHostname()).length(), 0);
+        send(this->getFd(), Reply::yourhost(this->getNickname()).c_str(), Reply::yourhost(this->getNickname()).length(), 0);
+        send(this->getFd(), Reply::created(this->getNickname()).c_str(), Reply::created(this->getNickname()).length(), 0);
+        send(this->getFd(), Reply::myinfo(this->getNickname()).c_str(), Reply::myinfo(this->getNickname()).length(), 0);
     }
 }
 
