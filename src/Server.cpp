@@ -288,6 +288,7 @@ void Server::acceptClient()
 
     client.setFd(requestFd);
     client.setIpAddress(inet_ntoa(clientAddress.sin_addr));
+    client.setHostname(inet_ntoa(clientAddress.sin_addr));
     this->_clientList.push_back(client);
     this->_fds.push_back(newPoll);
     std::cout << "Client " << requestFd << " connected !" << std::endl;

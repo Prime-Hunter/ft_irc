@@ -70,7 +70,7 @@ int Channel::isMember(Client *client) const
     return (0);
 }
 
-void Channel::sendMessage(std::string mess, Client *author)
+void Channel::broadcast(std::string mess, Client *author)
 {
     (void) author;
     std::set<Client*> list;
@@ -81,6 +81,25 @@ void Channel::sendMessage(std::string mess, Client *author)
     for (std::vector<Client*>::iterator it = _ops.begin(); it != _ops.end(); ++it)
     {
         list.insert(*it);
+    }
+    for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it)
+    {
+        send((*it)->getFd(), mess.c_str(), mess.length(), 0);
+    }
+}
+
+void Channel::sendMessage(std::string mess, Client *author)
+{
+    std::set<Client*> list;
+    for (std::vector<Client*>::iterator it = _connectedClients.begin(); it != _connectedClients.end(); ++it)
+    {
+        if ((*it)->getNickname() != author->getNickname())
+            list.insert(*it);
+    }
+    for (std::vector<Client*>::iterator it = _ops.begin(); it != _ops.end(); ++it)
+    {
+        if ((*it)->getNickname() != author->getNickname())
+            list.insert(*it);
     }
     for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it)
     {

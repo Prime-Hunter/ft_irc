@@ -30,7 +30,7 @@ void Command::part()
     }
 
     std::string partMsg = Reply::part(_target->getPrefix(), channelName);
-    chan->sendMessage(partMsg, _target);
+    chan->broadcast(partMsg, _target);
     chan->removeMember(_target);
     _target->setChannel(NULL);
     if (chan->getClientCount() == 0)

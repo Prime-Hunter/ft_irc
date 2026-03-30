@@ -35,6 +35,7 @@ class Channel
         void removeMember(Client* client);
         int isMember(Client* client) const;
         void setTopic(const std::string newTopic);
+        void broadcast(std::string mess, Client *author);
         void sendMessage(std::string mess, Client *author);
         std::string getUsers(void);
 };

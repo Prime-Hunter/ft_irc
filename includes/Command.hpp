@@ -31,13 +31,14 @@ class Command
         void part(void);
         void cap(void);
         void kick(void);
+        void privmsg(void);
 
     class UnknownCmd: public std::exception
     {
         public:
             virtual const char *what() const throw();
     };
-    
+
 };
 
 #endif

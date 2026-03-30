@@ -34,7 +34,7 @@ void Command::join()
     }
 
     std::string joinMsg = Reply::join(_target->getPrefix(), channelName);
-    chan->sendMessage(joinMsg, _target);
+    chan->broadcast(joinMsg, _target);
 
     std::string users = chan->getUsers();
     std::string namreply = Reply::namreply(_target->getPrefix(), channelName, users);

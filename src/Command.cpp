@@ -74,6 +74,10 @@ void Command::execCmd(void)
     {
         this->cap();
     }
+    else if (!this->_name.compare("PRIVMSG"))
+    {
+        this->privmsg();
+    }
     else if (!this->_name.compare("KICK"))
     {
         this->kick();

@@ -1,5 +1,5 @@
 - transformer sendMessage en PRIVMSG avec la commande adequat
-- implementer QUIT, TOPIC et KICK
+- implementer QUIT, TOPIC
 - rajouter les parametres necessaires puis implementer INVITE et MODE
 - ajouter PING command ?
 - faire le readme sa mere

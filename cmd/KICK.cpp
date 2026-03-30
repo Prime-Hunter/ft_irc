@@ -4,7 +4,7 @@ void Command::kick()
 {
     if (this->_args.size() < 3 || this->_args[1].empty() || this->_args[2].empty())
     {
-        this->_target->getChannel().sendMessage(Reply::needmoreparams(this->_target->getNickname(), this->_name), this->_target);
+        this->_target->getChannel().broadcast(Reply::needmoreparams(this->_target->getNickname(), this->_name), this->_target);
         return;
     }
 
@@ -13,15 +13,15 @@ void Command::kick()
     
     if (channel == NULL)
     {
-        channel->sendMessage(Reply::nosuchnick(this->_target->getNickname(), this->_args[1]), this->_target);
+        channel->broadcast(Reply::nosuchnick(this->_target->getNickname(), this->_args[1]), this->_target);
         return;
     }
     if (client == NULL)
     {
-        channel->sendMessage(Reply::nosuchnick(this->_target->getNickname(), this->_args[2]), this->_target);
+        channel->broadcast(Reply::nosuchnick(this->_target->getNickname(), this->_args[2]), this->_target);
         return;
     }
     channel->removeMember(client);
     client->setChannel(NULL);
-    channel->sendMessage(Reply::kick(this->_target->getNickname(), channel->getName(), client->getNickname(), ""), this->_target);
+    channel->broadcast(Reply::kick(this->_target->getNickname(), channel->getName(), client->getNickname(), ""), this->_target);
 }
