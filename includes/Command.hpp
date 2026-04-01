@@ -32,6 +32,10 @@ class Command
         void cap(void);
         void kick(void);
         void privmsg(void);
+        void invite(void);
+        void mode(void);
+        void topic(void);
+        void quit(void);
 
     class UnknownCmd: public std::exception
     {

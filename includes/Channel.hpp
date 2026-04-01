@@ -29,6 +29,9 @@ class Channel
         int getClientCount() const;
         int isInviteOnly() const;
         int isRestricted() const;
+        int isOperator(Client* client) const;
+        void setInviteOnly(int value);
+        void setRestricted(int value);
         
         void addMember(Client* client);
         void addOperator(Client* client);

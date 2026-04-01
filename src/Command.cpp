@@ -82,6 +82,22 @@ void Command::execCmd(void)
     {
         this->kick();
     }
+    else if (!this->_name.compare("INVITE"))
+    {
+        this->invite();
+    }
+    else if (!this->_name.compare("MODE"))
+    {
+        this->mode();
+    }
+    else if (!this->_name.compare("TOPIC"))
+    {
+        this->topic();
+    }
+    else if (!this->_name.compare("QUIT"))
+    {
+        this->quit();
+    }
     else
     {
         throw Command::UnknownCmd();

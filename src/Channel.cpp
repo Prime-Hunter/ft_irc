@@ -70,6 +70,19 @@ int Channel::isMember(Client *client) const
     return (0);
 }
 
+int Channel::isOperator(Client *client) const
+{
+    std::vector<Client *>::const_iterator i;
+    i = std::find(_ops.begin(), _ops.end(), client);
+    if (i != _ops.end())
+        return (1);
+    return (0);
+}
+
+void Channel::setInviteOnly(int value) { this->_inviteOnly = value; }
+
+void Channel::setRestricted(int value) { this->_secured = value; }
+
 void Channel::broadcast(std::string mess, Client *author)
 {
     (void) author;
