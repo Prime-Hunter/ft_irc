@@ -1,8 +1,0 @@
-- transformer sendMessage en PRIVMSG avec la commande adequat
-- implementer QUIT, TOPIC
-- rajouter les parametres necessaires puis implementer INVITE et MODE
-- ajouter PING command ?
-- faire le readme sa mere
-
-pour se log au serv fast: 'nc 127.0.0.1 4444' (n'importe quel port entre 1024 et 65535)
-pour se log depuis irssi: '/connect localhost 4444 irc42'
