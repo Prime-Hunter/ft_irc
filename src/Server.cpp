@@ -167,8 +167,6 @@ static std::vector<std::string> ft_split_irc(const std::string& str) {
             std::string trailing = token.substr(1);
             std::string rest;
             std::getline(iss, rest);
-            if (!rest.empty() && rest[0] == ' ')
-                rest.erase(0, 1);
             trailing += rest;
             tokens.push_back(trailing);
             break;

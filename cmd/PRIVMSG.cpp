@@ -56,5 +56,11 @@ void Command::privmsg(void)
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
         return;
     }
+    if (isCtcpMessage(message))
+    {
+        // Forward CTCP messages raw to the target client without server-side interpretation.
+        send(dst->getFd(), fullMsg.c_str(), fullMsg.length(), 0);
+        return;
+    }
     send(dst->getFd(), fullMsg.c_str(), fullMsg.length(), 0);
 }
