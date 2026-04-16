@@ -116,15 +116,18 @@ void Channel::broadcast(std::string mess, Client *author)
     std::set<Client*> list;
     for (std::vector<Client*>::iterator it = _connectedClients.begin(); it != _connectedClients.end(); ++it)
     {
-        list.insert(*it);
+        if (*it != NULL)
+            list.insert(*it);
     }
     for (std::vector<Client*>::iterator it = _ops.begin(); it != _ops.end(); ++it)
     {
-        list.insert(*it);
+        if (*it != NULL)
+            list.insert(*it);
     }
     for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it)
     {
-        send((*it)->getFd(), mess.c_str(), mess.length(), 0);
+        if (*it != NULL)
+            send((*it)->getFd(), mess.c_str(), mess.length(), 0);
     }
 }
 
@@ -133,17 +136,18 @@ void Channel::sendMessage(std::string mess, Client *author)
     std::set<Client*> list;
     for (std::vector<Client*>::iterator it = _connectedClients.begin(); it != _connectedClients.end(); ++it)
     {
-        if ((*it)->getNickname() != author->getNickname())
+        if (*it != NULL && (*it)->getNickname() != author->getNickname())
             list.insert(*it);
     }
     for (std::vector<Client*>::iterator it = _ops.begin(); it != _ops.end(); ++it)
     {
-        if ((*it)->getNickname() != author->getNickname())
+        if (*it != NULL && (*it)->getNickname() != author->getNickname())
             list.insert(*it);
     }
     for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it)
     {
-        send((*it)->getFd(), mess.c_str(), mess.length(), 0);
+        if (*it != NULL)
+            send((*it)->getFd(), mess.c_str(), mess.length(), 0);
     }
 }
 
@@ -152,14 +156,14 @@ std::string Channel::getUsers(void)
     std::string res = "";
     for (std::vector<Client *>::iterator it = _ops.begin(); it != _ops.end(); ++it)
     {
-        if (!(*it)->getNickname().empty())
+        if (*it != NULL && !(*it)->getNickname().empty())
         {
             res += "@" + (*it)->getNickname() + " ";
         }
     }
     for (std::vector<Client *>::iterator it = _connectedClients.begin(); it != _connectedClients.end(); ++it)
     {
-        if (!(*it)->getNickname().empty())
+        if (*it != NULL && !(*it)->getNickname().empty())
         {
             res += (*it)->getNickname() + " ";
         }
