@@ -42,7 +42,7 @@ void Command::kick()
         send(this->_target->getFd(), reply.c_str(), reply.length(), 0);
         return;
     }
+    channel->broadcast(Reply::kick(this->_target->getPrefix(), channel->getName(), client->getNickname(), ""), this->_target);
     channel->removeMember(client);
     client->setChannel(NULL);
-    channel->broadcast(Reply::kick(this->_target->getNickname(), channel->getName(), client->getNickname(), ""), this->_target);
 }

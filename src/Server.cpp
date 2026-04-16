@@ -9,7 +9,9 @@ Server::Server(void)
 }
 
 Server::~Server()
-{}
+{
+    delete this->_bot;
+}
 
 Server::Server(Server const &copy)
 {
@@ -76,7 +78,6 @@ void Server::closeFds(void)
 void Server::handleSignal(int signum)
 {
 	(void)signum;
-	std::cout << std::endl << "Signal Received!" << std::endl;
 	Server::_signal = true;
 }
 
@@ -125,6 +126,7 @@ void Server::serverInit(int port, std::string password)
     this->_password = password;
     this->createSocket();
     std::cout << "Server initialized successfully ! <PORT " << this->_port << "> <PASSWORD " << this->_password << ">" << std::endl;
+    this->_bot = new Bot();
     std::cout << "Waiting for client connection ..." << std::endl;
 
 	while (Server::_signal == false)
@@ -295,4 +297,9 @@ void Server::acceptClient()
 std::vector<Channel> *Server::getChannels(void)
 {
     return (&this->_channelList);
+}
+
+Bot *Server::getBot(void)
+{
+    return (this->_bot);
 }

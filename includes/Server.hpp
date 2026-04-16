@@ -19,6 +19,7 @@
 #include <netdb.h>
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Bot.hpp"
 
 class Channel;
 
@@ -34,6 +35,7 @@ class Server
         std::vector<Client> _clientList;
         std::vector<struct pollfd> _fds;
         std::vector<Channel> _channelList;
+        Bot *_bot;
     
     public:
         Server();
@@ -56,5 +58,6 @@ class Server
         std::string *getPword(void);
         std::vector<Client> *getList(void);
         std::vector<Channel> *getChannels(void);
+        Bot *getBot(void);
 
 };

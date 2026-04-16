@@ -30,7 +30,6 @@ void Command::privmsg(void)
     if (message[0] == ':')
         message = message.substr(1);
     std::string fullMsg = Reply::privmsg(_target->getPrefix(), target, message);
-    std::cout << "full message sent: " << fullMsg << std::endl;
     if (target[0] == '#')
     {
         Channel *chan = getChannel(target);
@@ -47,6 +46,7 @@ void Command::privmsg(void)
             return;
         }
         chan->sendMessage(fullMsg, _target);
+        _serv->getBot()->checkMsg(message, chan, _target);
         return;
     }
     Client *dst = getNClient(target);
