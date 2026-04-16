@@ -38,45 +38,72 @@ void Channel::addOperator(Client *client)
 
 void Channel::removeMember(Client *client)
 {
-    std::vector<Client *>::iterator i;
-    i = std::find(this->_connectedClients.begin(), this->_connectedClients.end(), client);
-    if (i != this->_connectedClients.end())
+    if (client == NULL)
+        return;
+    
+    std::string nickname = client->getNickname();
+    
+    // Supprimer des membres réguliers
+    for (std::vector<Client *>::iterator i = this->_connectedClients.begin(); i != this->_connectedClients.end(); ++i)
     {
-        this->_connectedClients.erase(i);
-        this->_connectedCount--;
+        if (*i != NULL && (*i)->getNickname() == nickname)
+        {
+            this->_connectedClients.erase(i);
+            this->_connectedCount--;
+            break;
+        }
     }
-    std::vector<Client *>::iterator op;
-    op = std::find(this->_ops.begin(), this->_ops.end(), client);
-    if (op != this->_ops.end())
+    
+    // Supprimer des opérateurs
+    for (std::vector<Client *>::iterator i = this->_ops.begin(); i != this->_ops.end(); ++i)
     {
-        this->_ops.erase(op);
-        this->_connectedCount--;
+        if (*i != NULL && (*i)->getNickname() == nickname)
+        {
+            this->_ops.erase(i);
+            this->_connectedCount--;
+            break;
+        }
     }
 }
 
 int Channel::isMember(Client *client) const
 {
-    std::vector<Client *>::const_iterator i;
-    i = std::find(_connectedClients.begin(), _connectedClients.end(), client);
-    if (i != this->_connectedClients.end())
+    if (client == NULL)
+        return 0;
+    
+    // Comparer par nickname au lieu de pointer (évite dangling pointers)
+    std::string nickname = client->getNickname();
+    
+    for (std::vector<Client *>::const_iterator i = _connectedClients.begin(); i != _connectedClients.end(); ++i)
     {
-        return (1);
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return 1;
     }
-    i = std::find(_ops.begin(), _ops.end(), client);
-    if (i != this->_ops.end())
+    
+    for (std::vector<Client *>::const_iterator i = _ops.begin(); i != _ops.end(); ++i)
     {
-        return (1);
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return 1;
     }
-    return (0);
+    
+    return 0;
 }
 
 int Channel::isOperator(Client *client) const
 {
-    std::vector<Client *>::const_iterator i;
-    i = std::find(_ops.begin(), _ops.end(), client);
-    if (i != _ops.end())
-        return (1);
-    return (0);
+    if (client == NULL)
+        return 0;
+    
+    // Comparer par nickname au lieu de pointer (évite dangling pointers)
+    std::string nickname = client->getNickname();
+    
+    for (std::vector<Client *>::const_iterator i = _ops.begin(); i != _ops.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return 1;
+    }
+    
+    return 0;
 }
 
 void Channel::setInviteOnly(int value) { this->_inviteOnly = value; }
