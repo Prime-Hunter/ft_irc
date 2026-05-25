@@ -1,4 +1,4 @@
-This project has been created as part of the 42 curriculum by lde-guil, barnaud & lgoras
+*This project has been created as part of the 42 curriculum by lde-guil, barnaud & lgoras*
 
 # Internet Relay Chat — `ircserv`
 

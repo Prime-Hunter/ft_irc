@@ -26,14 +26,53 @@ void Channel::setTopic(const std::string topic) {this->_topic = topic;}
 
 void Channel::addMember(Client *client) 
 {
+    if (client == NULL)
+        return;
+
+    std::string nickname = client->getNickname();
+    for (std::vector<Client *>::iterator i = this->_connectedClients.begin(); i != this->_connectedClients.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return;
+    }
+
+    bool wasOp = false;
+    for (std::vector<Client *>::iterator i = this->_ops.begin(); i != this->_ops.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+        {
+            this->_ops.erase(i);
+            wasOp = true;
+            break;
+        }
+    }
+
     this->_connectedClients.push_back(client);
-    this->_connectedCount++;
+    if (!wasOp)
+        this->_connectedCount++;
 }
 
 void Channel::addOperator(Client *client) 
 {
+    if (client == NULL)
+        return;
+
+    std::string nickname = client->getNickname();
+    for (std::vector<Client *>::iterator i = this->_ops.begin(); i != this->_ops.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return;
+    }
+
+    for (std::vector<Client *>::iterator i = this->_connectedClients.begin(); i != this->_connectedClients.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+        {
+            this->_connectedClients.erase(i);
+            break;
+        }
+    }
     this->_ops.push_back(client);
-    this->_connectedCount++;
 }
 
 void Channel::removeMember(Client *client)
@@ -131,6 +170,14 @@ void Channel::removeOperator(Client *client)
             break;
         }
     }
+
+    for (std::vector<Client *>::iterator i = this->_connectedClients.begin(); i != this->_connectedClients.end(); ++i)
+    {
+        if (*i != NULL && (*i)->getNickname() == nickname)
+            return;
+    }
+    this->_connectedClients.push_back(client);
+    this->_connectedCount++;
 }
 
 void Channel::broadcast(std::string mess, Client *author)
@@ -192,4 +239,25 @@ std::string Channel::getUsers(void)
         }
     }
     return (res);
+}
+
+int Channel::isClientInvited(Client *target)
+{
+    std::cout << "loop start" << std::endl;
+    for (std::set<Client *>::iterator i = this->_list.begin(); i != this->_list.end(); ++i)
+    {
+        std::cout << target->getNickname() << " | " << (*i)->getNickname() << std::endl;
+        if (target->getNickname() == (*i)->getNickname())
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void Channel::addInvite(Client *target)
+{
+    if (target == NULL)
+        return;
+    this->_list.insert(target);
 }

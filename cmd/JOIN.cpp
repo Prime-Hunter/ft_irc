@@ -14,10 +14,16 @@ void Command::join()
         return;
     }
     Channel *chan = getChannel(channelName);
-    if (!chan) {
+    if (!chan) 
+    {
         Channel newChan(channelName);
         _serv->getChannels()->push_back(newChan);
         chan = &(_serv->getChannels()->back());
+    } else if (chan->getClientCount() >= chan->getUserLimit() && chan->getUserLimit() != 0) 
+    {
+        std::string reply = Reply::channelisfull(_target->getNickname(), channelName);
+        send(_target->getFd(), reply.c_str(), reply.length(), 0);
+        return ;
     }
     if (chan->isInviteOnly()) {
         std::string reply = Reply::inviteonlychan(_target->getNickname(), channelName);
@@ -29,7 +35,8 @@ void Command::join()
     }
     if (chan->getClientCount() == 0) {
         chan->addOperator(_target);
-    } else {
+    } else 
+    {
         chan->addMember(_target);
     }
 

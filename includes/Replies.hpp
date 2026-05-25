@@ -44,6 +44,13 @@ class Reply
         static std::string quit(const std::string &nick, const std::string &message) {return ":" + nick + " QUIT :Quit: " + message + "\r\n";}
         static std::string kick(const std::string &nick, const std::string &channel, const std::string &target, const std::string &reason) {return ":" + nick + " KICK " + channel + " " + target + " :" + reason + "\r\n";}
         static std::string mode(const std::string &nick, const std::string &channel, const std::string &modes, const std::string &args) {return ":" + nick + " MODE " + channel + " " + modes + " " + args + "\r\n";}
+        
+        // LUSERS reply
+        static std::string lusersreply(const std::string &nick, int totalusers) {
+            std::stringstream ss;
+            ss << ":localhost 251 " << nick << " :There are " << totalusers << " users\r\n";
+            return ss.str();
+        }
 };
 
 #endif

@@ -37,6 +37,8 @@ class Command
         void topic(void);
         void ping(void);
         void quit(void);
+        void lusers(void);
+        void names(void);
 
     class UnknownCmd: public std::exception
     {

@@ -36,6 +36,7 @@ void Command::invite(void)
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
         return;
     }
+    chan->addInvite(invitee);
     std::string inviteMsg = ":" + _target->getPrefix() + " INVITE " + inviteeNick + " " + channelName + "\r\n";
     send(_target->getFd(), inviteMsg.c_str(), inviteMsg.length(), 0);
     send(invitee->getFd(), inviteMsg.c_str(), inviteMsg.length(), 0);

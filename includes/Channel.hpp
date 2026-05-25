@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class Client;
 
@@ -20,6 +21,7 @@ class Channel
         int _connectedCount;
 
     public:
+        std::set<Client *> _list;
         Channel();
         Channel(const std::string &name);
         ~Channel();
@@ -45,6 +47,8 @@ class Channel
         void setTopic(const std::string newTopic);
         void broadcast(std::string mess, Client *author);
         void sendMessage(std::string mess, Client *author);
+        int isClientInvited(Client *target);
+        void addInvite(Client *target);
         std::string getUsers(void);
 };
 

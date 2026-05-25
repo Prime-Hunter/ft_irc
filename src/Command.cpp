@@ -107,6 +107,14 @@ void Command::execCmd(void)
     {
         this->quit();
     }
+    else if (!this->_name.compare("LUSERS"))
+    {
+        this->lusers();
+    }
+    else if (!this->_name.compare("NAMES"))
+    {
+        this->names();
+    }
     else
     {
         throw Command::UnknownCmd();
