@@ -4,9 +4,9 @@
 #include <iostream>
 #include <set>
 
-Channel::Channel(): _name(""), _topic(""), _inviteOnly(0), _secured(0), _userLimit(0), _connectedCount(0) {}
+Channel::Channel(): _name(""), _topic(""), _key(""), _inviteOnly(0), _secured(0), _userLimit(0), _connectedCount(1) {}
 
-Channel::Channel(const std::string &name): _name(name), _topic(""), _inviteOnly(0) , _secured(0), _userLimit(0), _connectedCount(0){}
+Channel::Channel(const std::string &name): _name(name), _topic("") , _key("") , _inviteOnly(0) , _secured(0), _userLimit(0), _connectedCount(1) {}
 
 Channel::~Channel() {}
 
@@ -69,6 +69,7 @@ void Channel::addOperator(Client *client)
         if (*i != NULL && (*i)->getNickname() == nickname)
         {
             this->_connectedClients.erase(i);
+            this->_connectedCount--;
             break;
         }
     }
@@ -82,24 +83,21 @@ void Channel::removeMember(Client *client)
     
     std::string nickname = client->getNickname();
     
-    // Supprimer des membres réguliers
     for (std::vector<Client *>::iterator i = this->_connectedClients.begin(); i != this->_connectedClients.end(); ++i)
     {
         if (*i != NULL && (*i)->getNickname() == nickname)
         {
             this->_connectedClients.erase(i);
             this->_connectedCount--;
-            break;
+            return;
         }
     }
     
-    // Supprimer des opérateurs
     for (std::vector<Client *>::iterator i = this->_ops.begin(); i != this->_ops.end(); ++i)
     {
         if (*i != NULL && (*i)->getNickname() == nickname)
         {
             this->_ops.erase(i);
-            this->_connectedCount--;
             break;
         }
     }
@@ -110,7 +108,6 @@ int Channel::isMember(Client *client) const
     if (client == NULL)
         return 0;
     
-    // Comparer par nickname au lieu de pointer (évite dangling pointers)
     std::string nickname = client->getNickname();
     
     for (std::vector<Client *>::const_iterator i = _connectedClients.begin(); i != _connectedClients.end(); ++i)
@@ -133,7 +130,6 @@ int Channel::isOperator(Client *client) const
     if (client == NULL)
         return 0;
     
-    // Comparer par nickname au lieu de pointer (évite dangling pointers)
     std::string nickname = client->getNickname();
     
     for (std::vector<Client *>::const_iterator i = _ops.begin(); i != _ops.end(); ++i)
@@ -177,7 +173,6 @@ void Channel::removeOperator(Client *client)
             return;
     }
     this->_connectedClients.push_back(client);
-    this->_connectedCount++;
 }
 
 void Channel::broadcast(std::string mess, Client *author)
@@ -243,10 +238,8 @@ std::string Channel::getUsers(void)
 
 int Channel::isClientInvited(Client *target)
 {
-    std::cout << "loop start" << std::endl;
     for (std::set<Client *>::iterator i = this->_list.begin(); i != this->_list.end(); ++i)
     {
-        std::cout << target->getNickname() << " | " << (*i)->getNickname() << std::endl;
         if (target->getNickname() == (*i)->getNickname())
         {
             return 1;
@@ -261,3 +254,5 @@ void Channel::addInvite(Client *target)
         return;
     this->_list.insert(target);
 }
+
+std::string const Channel::getKey() {return this->_key;}

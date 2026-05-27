@@ -36,7 +36,7 @@ void Command::topic(void)
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
         return;
     }
-    if (!chan->isOperator(_target))
+    if (!chan->isOperator(_target) && chan->isRestricted())
     {
         std::string reply = Reply::chanoprivsneeded(_target->getNickname(), channelName);
         send(_target->getFd(), reply.c_str(), reply.length(), 0);

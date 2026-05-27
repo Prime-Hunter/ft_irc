@@ -36,6 +36,7 @@ class Channel
         void setInviteOnly(int value);
         void setRestricted(int value);
         void setKey(const std::string &key);
+        std::string const getKey();
         void setUserLimit(int limit);
         int getUserLimit() const;
         

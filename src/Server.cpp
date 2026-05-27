@@ -35,7 +35,7 @@ std::string *Server::getPword(void)
     return (&this->_password);
 }
 
-std::vector<Client> *Server::getList(void)
+std::list<Client> *Server::getList(void)
 {
     return (&this->_clientList);
 }
@@ -50,11 +50,11 @@ void Server::clearClient(int clientFd)
             break;
         }
 	}
-	for (size_t i = 0; i < this->_clientList.size(); i++)
+	for (std::list<Client>::iterator it = this->_clientList.begin(); it != this->_clientList.end(); ++it)
     {
-		if (this->_clientList[i].getFd() == clientFd)
+		if (it->getFd() == clientFd)
 		{
-            this->_clientList.erase(this->_clientList.begin() + i); 
+            this->_clientList.erase(it);
             break;
         }
 	}
@@ -63,15 +63,406 @@ void Server::clearClient(int clientFd)
 
 void Server::closeFds(void)
 {
-    for (size_t i =0 ; i < this->_clientList.size(); i++)
+    for (std::list<Client>::iterator it = this->_clientList.begin(); it != this->_clientList.end(); ++it)
     {
-        std::cout << this->_clientList[i].getFd() << " disconnected" << std::endl;
-        close(this->_clientList[i].getFd());
+        std::cout << it->getFd() << " disconnected" << std::endl;
+        close(it->getFd());
     }
     if (this->_socketFd != -1)
     {
         std::cout << "Server " << this->_socketFd << " disconnected" << std::endl;
         close(this->_socketFd);
+    }
+    for (std::vector<DccProxy>::iterator it = this->_dccProxies.begin(); it != this->_dccProxies.end(); ++it)
+    {
+        if (it->proxyListenFd != -1)
+            close(it->proxyListenFd);
+        if (it->proxyConnectionFd != -1)
+            close(it->proxyConnectionFd);
+        if (it->senderDataFd != -1)
+            close(it->senderDataFd);
+    }
+}
+
+void Server::addPollFd(int fd, short events)
+{
+    struct pollfd pfd;
+    pfd.fd = fd;
+    pfd.events = events;
+    pfd.revents = 0;
+    this->_fds.push_back(pfd);
+}
+
+void Server::removePollFd(int fd)
+{
+    for (size_t i = 0; i < this->_fds.size(); ++i)
+    {
+        if (this->_fds[i].fd == fd)
+        {
+            this->_fds.erase(this->_fds.begin() + i);
+            return;
+        }
+    }
+}
+
+void Server::updatePollFd(int fd, short events)
+{
+    for (size_t i = 0; i < this->_fds.size(); ++i)
+    {
+        if (this->_fds[i].fd == fd)
+        {
+            this->_fds[i].events = events;
+            return;
+        }
+    }
+}
+
+Server::DccProxy *Server::getDccProxyByFd(int fd)
+{
+    for (std::vector<DccProxy>::iterator it = this->_dccProxies.begin(); it != this->_dccProxies.end(); ++it)
+    {
+        if (it->proxyListenFd == fd || it->proxyConnectionFd == fd || it->senderDataFd == fd)
+            return &(*it);
+    }
+    return NULL;
+}
+
+Server::DccProxy *Server::getDccProxyByListenFd(int fd)
+{
+    for (std::vector<DccProxy>::iterator it = this->_dccProxies.begin(); it != this->_dccProxies.end(); ++it)
+    {
+        if (it->proxyListenFd == fd)
+            return &(*it);
+    }
+    return NULL;
+}
+
+Server::DccProxy *Server::getDccProxyBySenderAndName(int senderFd, const std::string &filename)
+{
+    for (std::vector<DccProxy>::iterator it = this->_dccProxies.begin(); it != this->_dccProxies.end(); ++it)
+    {
+        if (it->senderClientFd == senderFd && it->filename == filename)
+            return &(*it);
+    }
+    return NULL;
+}
+
+void Server::removeDccProxy(int index)
+{
+    if (index < 0 || static_cast<size_t>(index) >= this->_dccProxies.size())
+        return;
+
+    DccProxy &proxy = this->_dccProxies[index];
+    if (proxy.proxyListenFd != -1)
+    {
+        close(proxy.proxyListenFd);
+        removePollFd(proxy.proxyListenFd);
+    }
+    if (proxy.proxyConnectionFd != -1)
+    {
+        close(proxy.proxyConnectionFd);
+        removePollFd(proxy.proxyConnectionFd);
+    }
+    if (proxy.senderDataFd != -1)
+    {
+        close(proxy.senderDataFd);
+        removePollFd(proxy.senderDataFd);
+    }
+    this->_dccProxies.erase(this->_dccProxies.begin() + index);
+}
+
+std::string Server::getServerIp(void)
+{
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == 0)
+    {
+        struct hostent *host = gethostbyname(hostname);
+        if (host && host->h_addr_list && host->h_addr_list[0])
+        {
+            struct in_addr addr;
+            memcpy(&addr, host->h_addr_list[0], sizeof(struct in_addr));
+            return std::string(inet_ntoa(addr));
+        }
+    }
+    return std::string("127.0.0.1");
+}
+
+void Server::startDccProxy(Client *sender, Client *receiver, const std::string &filename, const std::string &senderIp, int senderPort, size_t fileSize)
+{
+    int listenFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenFd == -1)
+    {
+        std::cerr << "Failed to create DCC proxy socket" << std::endl;
+        return;
+    }
+    int val = 1;
+    if (setsockopt(listenFd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) == -1)
+    {
+        close(listenFd);
+        std::cerr << "Failed to set SO_REUSEADDR for DCC proxy" << std::endl;
+        return;
+    }
+    if (fcntl(listenFd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        close(listenFd);
+        std::cerr << "Failed to set nonblocking on DCC proxy" << std::endl;
+        return;
+    }
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(0);
+    addr.sin_addr.s_addr = INADDR_ANY;
+    if (bind(listenFd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+    {
+        close(listenFd);
+        std::cerr << "Failed to bind DCC proxy socket" << std::endl;
+        return;
+    }
+    if (listen(listenFd, 1) == -1)
+    {
+        close(listenFd);
+        std::cerr << "Failed to listen on DCC proxy socket" << std::endl;
+        return;
+    }
+    socklen_t addrlen = sizeof(addr);
+    if (getsockname(listenFd, (struct sockaddr *)&addr, &addrlen) == -1)
+    {
+        close(listenFd);
+        std::cerr << "Failed to query DCC proxy port" << std::endl;
+        return;
+    }
+
+    DccProxy proxy;
+    proxy.proxyListenFd = listenFd;
+    proxy.senderDataFd = -1;
+    proxy.senderClientFd = sender->getFd();
+    proxy.receiverClientFd = receiver->getFd();
+    proxy.senderIp = senderIp;
+    proxy.senderPort = senderPort;
+    proxy.filename = filename;
+    proxy.fileSize = fileSize;
+    proxy.proxyPort = ntohs(addr.sin_port);
+    proxy.receiverConnected = false;
+    proxy.senderConnected = false;
+    this->_dccProxies.push_back(proxy);
+    this->addPollFd(listenFd, POLLIN);
+
+    std::string serverIp = this->getServerIp();
+    std::ostringstream oss;
+    oss << "\001DCC SEND " << filename << " " << serverIp << " " << proxy.proxyPort << " " << fileSize << "\001";
+    std::string dccMsg = oss.str();
+    std::string fullMsg = Reply::privmsg(sender->getPrefix(), receiver->getNickname(), dccMsg);
+    send(receiver->getFd(), fullMsg.c_str(), fullMsg.length(), 0);
+}
+
+static bool isNumericIp(const std::string &ip)
+{
+    for (size_t i = 0; i < ip.size(); ++i)
+    {
+        if (!std::isdigit(static_cast<unsigned char>(ip[i])))
+            return false;
+    }
+    return true;
+}
+
+static ssize_t flushPending(int fd, std::string &pending)
+{
+    if (pending.empty())
+        return 0;
+    ssize_t sent = send(fd, pending.c_str(), pending.size(), 0);
+    if (sent > 0)
+        pending.erase(0, sent);
+    return sent;
+}
+
+void Server::handleDccEvent(int fd, short revents)
+{
+    DccProxy *proxy = this->getDccProxyByFd(fd);
+    if (!proxy)
+        return;
+
+    if (proxy->proxyListenFd == fd)
+    {
+        struct sockaddr_in clientAddr;
+        socklen_t len = sizeof(clientAddr);
+        int clientFd = accept(fd, (struct sockaddr *)&clientAddr, &len);
+        if (clientFd == -1)
+            return;
+        if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
+        {
+            close(clientFd);
+            return;
+        }
+        proxy->proxyConnectionFd = clientFd;
+        proxy->receiverConnected = true;
+        this->addPollFd(clientFd, POLLIN);
+
+        int senderFd = socket(AF_INET, SOCK_STREAM, 0);
+        if (senderFd == -1)
+        {
+            std::cerr << "DCC proxy: failed to create sender socket" << std::endl;
+            removeDccProxy(proxy - &this->_dccProxies[0]);
+            return;
+        }
+        if (fcntl(senderFd, F_SETFL, O_NONBLOCK) == -1)
+        {
+            close(senderFd);
+            std::cerr << "DCC proxy: failed to set sender socket nonblocking" << std::endl;
+            removeDccProxy(proxy - &this->_dccProxies[0]);
+            return;
+        }
+
+        struct sockaddr_in senderAddr;
+        memset(&senderAddr, 0, sizeof(senderAddr));
+        senderAddr.sin_family = AF_INET;
+        senderAddr.sin_port = htons(proxy->senderPort);
+        if (isNumericIp(proxy->senderIp))
+        {
+            senderAddr.sin_addr.s_addr = static_cast<in_addr_t>(std::strtoul(proxy->senderIp.c_str(), NULL, 10));
+        }
+        else
+        {
+            if (inet_aton(proxy->senderIp.c_str(), &senderAddr.sin_addr) == 0)
+            {
+                std::cerr << "DCC proxy: invalid sender IP " << proxy->senderIp << std::endl;
+                close(senderFd);
+                removeDccProxy(proxy - &this->_dccProxies[0]);
+                return;
+            }
+        }
+
+        int connectResult = connect(senderFd, (struct sockaddr *)&senderAddr, sizeof(senderAddr));
+        if (connectResult == -1 && errno != EINPROGRESS)
+        {
+            std::cerr << "DCC proxy: unable to connect to sender " << proxy->senderIp << ":" << proxy->senderPort << std::endl;
+            close(senderFd);
+            removeDccProxy(proxy - &this->_dccProxies[0]);
+            return;
+        }
+        proxy->senderDataFd = senderFd;
+        proxy->senderConnected = (connectResult == 0);
+        short events = proxy->senderConnected ? POLLIN : POLLOUT;
+        this->addPollFd(senderFd, events);
+
+        std::cout << "DCC proxy: receiver connected on port " << proxy->proxyPort << ". bridging to sender " << proxy->senderIp << ":" << proxy->senderPort << std::endl;
+        return;
+    }
+
+    if (proxy->senderDataFd == fd)
+    {
+        if (!proxy->senderConnected)
+        {
+            if (revents & POLLOUT)
+            {
+                int err = 0;
+                socklen_t len = sizeof(err);
+                if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) == -1 || err != 0)
+                {
+                    std::cerr << "DCC proxy: sender connection failed" << std::endl;
+                    removeDccProxy(proxy - &this->_dccProxies[0]);
+                    return;
+                }
+                proxy->senderConnected = true;
+                short events = POLLIN;
+                if (!proxy->receiverPending.empty())
+                    events |= POLLOUT;
+                this->updatePollFd(fd, events);
+            }
+            return;
+        }
+
+        if ((revents & POLLIN) && proxy->proxyConnectionFd != -1)
+        {
+            char buffer[BUFFER_SIZE];
+            ssize_t count = recv(fd, buffer, sizeof(buffer), 0);
+            if (count <= 0)
+            {
+                removeDccProxy(proxy - &this->_dccProxies[0]);
+                return;
+            }
+            ssize_t sent = send(proxy->proxyConnectionFd, buffer, count, 0);
+            if (sent < 0)
+            {
+                if (errno != EAGAIN && errno != EWOULDBLOCK)
+                {
+                    removeDccProxy(proxy - &this->_dccProxies[0]);
+                    return;
+                }
+                proxy->senderPending.append(buffer, count);
+                this->updatePollFd(proxy->proxyConnectionFd, POLLIN | POLLOUT);
+            }
+            else if (static_cast<size_t>(sent) < static_cast<size_t>(count))
+            {
+                proxy->senderPending.append(buffer + sent, count - sent);
+                this->updatePollFd(proxy->proxyConnectionFd, POLLIN | POLLOUT);
+            }
+        }
+
+        if ((revents & POLLOUT) && !proxy->senderPending.empty() && proxy->proxyConnectionFd != -1)
+        {
+            ssize_t sent = flushPending(proxy->proxyConnectionFd, proxy->senderPending);
+            if (sent < 0)
+            {
+                removeDccProxy(proxy - &this->_dccProxies[0]);
+                return;
+            }
+            if (proxy->senderPending.empty())
+                this->updatePollFd(proxy->proxyConnectionFd, POLLIN);
+        }
+        return;
+    }
+
+    if (proxy->proxyConnectionFd == fd)
+    {
+        if (revents & POLLIN)
+        {
+            char buffer[BUFFER_SIZE];
+            ssize_t count = recv(fd, buffer, sizeof(buffer), 0);
+            if (count <= 0)
+            {
+                removeDccProxy(proxy - &this->_dccProxies[0]);
+                return;
+            }
+            if (proxy->senderDataFd == -1 || !proxy->senderConnected)
+            {
+                proxy->receiverPending.append(buffer, count);
+                if (proxy->senderDataFd != -1)
+                    this->updatePollFd(proxy->senderDataFd, POLLIN | POLLOUT);
+            }
+            else
+            {
+                ssize_t sent = send(proxy->senderDataFd, buffer, count, 0);
+                if (sent < 0)
+                {
+                    if (errno != EAGAIN && errno != EWOULDBLOCK)
+                    {
+                        removeDccProxy(proxy - &this->_dccProxies[0]);
+                        return;
+                    }
+                    proxy->receiverPending.append(buffer, count);
+                    this->updatePollFd(proxy->senderDataFd, POLLIN | POLLOUT);
+                }
+                else if (static_cast<size_t>(sent) < static_cast<size_t>(count))
+                {
+                    proxy->receiverPending.append(buffer + sent, count - sent);
+                    this->updatePollFd(proxy->senderDataFd, POLLIN | POLLOUT);
+                }
+            }
+        }
+
+        if ((revents & POLLOUT) && !proxy->senderPending.empty())
+        {
+            ssize_t sent = flushPending(fd, proxy->senderPending);
+            if (sent < 0)
+            {
+                removeDccProxy(proxy - &this->_dccProxies[0]);
+                return;
+            }
+            if (proxy->senderPending.empty())
+                this->updatePollFd(fd, POLLIN);
+        }
+        return;
     }
 }
 
@@ -150,6 +541,10 @@ void Server::serverInit(int port, std::string password)
                         std::cout << "Error: " << e.what() << std::endl;
                     }
 				}
+				else if (this->getDccProxyByFd(this->_fds[i].fd) != NULL)
+				{
+					this->handleDccEvent(this->_fds[i].fd, this->_fds[i].revents);
+				}
 				else
 				{
 					this->newClientData(this->_fds[i].fd);
@@ -226,7 +621,7 @@ void Server::newClientData(int fd)
             if (line.empty())
                 continue;
 
-            std::cout << "data received line: " << line << std::endl;
+            std::cout << "received line: " << line << std::endl;
 
             if (isUpperCmd(line))
             {
@@ -257,10 +652,10 @@ void Server::newClientData(int fd)
 
 Client *Server::getClient(int fd)
 {
-    for (size_t i = 0 ; i < this->_clientList.size(); i++)
+    for (std::list<Client>::iterator it = this->_clientList.begin(); it != this->_clientList.end(); ++it)
     {
-        if (this->_clientList[i].getFd() == fd)
-            return (&this->_clientList[i]);
+        if (it->getFd() == fd)
+            return (&(*it));
     }
     return (NULL);
 }

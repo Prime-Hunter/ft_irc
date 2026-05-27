@@ -59,6 +59,7 @@ class Client
         void clearTempBuffer(void);
         void logIn(void);
         void checkAuth(void);
+        bool isRegistered(void);
         bool hasChannel(void);
 };
 

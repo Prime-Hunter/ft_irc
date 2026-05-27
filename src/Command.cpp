@@ -18,8 +18,8 @@ void Command::displayCmd()
 
 int Command::isAvailableNickname(const std::string &nick)
 {
-    std::vector<Client> *list = this->getServ()->getList();
-    for (std::vector<Client>::iterator it = list->begin(); it != list->end(); ++it)
+    std::list<Client> *list = this->getServ()->getList();
+    for (std::list<Client>::iterator it = list->begin(); it != list->end(); ++it)
     {
         if (it->getNickname() == nick) {return 0;}
     }
@@ -39,8 +39,8 @@ Channel *Command::getChannel(const std::string &name)
 
 Client *Command::getNClient(const std::string &name)
 {
-    std::vector<Client> *list = this->getServ()->getList();
-    for (std::vector<Client>::iterator it = list->begin(); it != list->end(); ++it)
+    std::list<Client> *list = this->getServ()->getList();
+    for (std::list<Client>::iterator it = list->begin(); it != list->end(); ++it)
     {
         if (it->getNickname() == name)
             return &(*it);
@@ -55,6 +55,17 @@ bool isCtcpMessage(const std::string &message)
 
 void Command::execCmd(void)
 {
+    std::string nick = this->_target->getNickname().empty() ? "*" : this->_target->getNickname();
+    if (!this->_target->isRegistered())
+    {
+        if (this->_name != "PASS" && this->_name != "NICK" && this->_name != "USER" && this->_name != "QUIT" && this->_name != "CAP" && this->_name != "PING")
+        {
+            std::string message = Reply::notregistered(nick);
+            send(this->_target->getFd(), message.c_str(), message.length(), 0);
+            return;
+        }
+    }
+
     if (!this->_name.compare("PASS"))
     {
         this->pass();

@@ -16,6 +16,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include <cctype>
+#include <list>
 #include <netdb.h>
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -32,11 +34,32 @@ class Server
         std::string _password;
         int _socketFd;
         static bool _signal;
-        std::vector<Client> _clientList;
+        std::list<Client> _clientList;
         std::vector<struct pollfd> _fds;
         std::vector<Channel> _channelList;
         Bot *_bot;
-    
+
+        struct DccProxy
+        {
+            int proxyListenFd;
+            int proxyConnectionFd;
+            int senderDataFd;
+            int senderClientFd;
+            int receiverClientFd;
+            std::string senderIp;
+            int senderPort;
+            std::string filename;
+            size_t fileSize;
+            int proxyPort;
+            bool receiverConnected;
+            bool senderConnected;
+            std::string senderPending;
+            std::string receiverPending;
+            DccProxy(): proxyListenFd(-1), proxyConnectionFd(-1), senderDataFd(-1), senderClientFd(-1), receiverClientFd(-1), senderPort(0), fileSize(0), proxyPort(0), receiverConnected(false), senderConnected(false) {}
+        };
+
+        std::vector<DccProxy> _dccProxies;
+
     public:
         Server();
         ~Server();
@@ -56,8 +79,20 @@ class Server
         Client *getClient(int fd);
 
         std::string *getPword(void);
-        std::vector<Client> *getList(void);
+        std::list<Client> *getList(void);
         std::vector<Channel> *getChannels(void);
         Bot *getBot(void);
+
+        void addPollFd(int fd, short events);
+        void removePollFd(int fd);
+        void updatePollFd(int fd, short events);
+        DccProxy *getDccProxyByFd(int fd);
+        DccProxy *getDccProxyByListenFd(int fd);
+        DccProxy *getDccProxyBySenderReceiver(int senderFd, int receiverFd, const std::string &filename);
+        DccProxy *getDccProxyBySenderAndName(int senderFd, const std::string &filename);
+        void removeDccProxy(int index);
+        void handleDccEvent(int fd, short revents);
+        void startDccProxy(Client *sender, Client *receiver, const std::string &filename, const std::string &senderIp, int senderPort, size_t fileSize);
+        std::string getServerIp(void);
 
 };

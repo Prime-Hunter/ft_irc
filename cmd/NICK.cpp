@@ -55,8 +55,8 @@ void Command::nick(void)
         send(this->_target->getFd(), message.c_str(), message.length(), 0);
         return ;
     }
-    std::vector<Client> *clients = this->_serv->getList();
-    for (std::vector<Client>::iterator it = clients->begin(); it != clients->end(); ++it)
+    std::list<Client> *clients = this->_serv->getList();
+    for (std::list<Client>::iterator it = clients->begin(); it != clients->end(); ++it)
     {
         if (it->getFd() != this->_target->getFd() && it->getNickname() == this->_args[1] && !it->getNickname().empty())
         {

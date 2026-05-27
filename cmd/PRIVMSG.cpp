@@ -58,7 +58,25 @@ void Command::privmsg(void)
     }
     if (isCtcpMessage(message))
     {
-        // Forward CTCP messages raw to the target client without server-side interpretation.
+        std::string inner = message.substr(1, message.size() - 2);
+        std::istringstream iss(inner);
+        std::vector<std::string> dccArgs;
+        std::string token;
+        while (iss >> token)
+            dccArgs.push_back(token);
+
+        if (dccArgs.size() >= 5 && dccArgs[0] == "DCC" && dccArgs[1] == "SEND")
+        {
+            std::string filename = dccArgs[2];
+            std::string senderIp = dccArgs[3];
+            int senderPort = std::atoi(dccArgs[4].c_str());
+            size_t fileSize = 0;
+            if (dccArgs.size() >= 6)
+                fileSize = std::strtoul(dccArgs[5].c_str(), NULL, 10);
+            _serv->startDccProxy(_target, dst, filename, senderIp, senderPort, fileSize);
+            return;
+        }
+
         send(dst->getFd(), fullMsg.c_str(), fullMsg.length(), 0);
         return;
     }

@@ -2,7 +2,7 @@
 
 void Command::lusers(void)
 {
-    std::vector<Client> *clientList = _serv->getList();
+    std::list<Client> *clientList = _serv->getList();
     int totalUsers = clientList->size();
     
     std::string reply = Reply::lusersreply(_target->getNickname(), totalUsers);

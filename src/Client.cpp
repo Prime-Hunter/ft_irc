@@ -105,6 +105,11 @@ void Client::checkAuth(void)
     }
 }
 
+bool Client::isRegistered(void)
+{
+    return (this->getLogin() && !this->getUsername().empty() && !this->getNickname().empty());
+}
+
 bool Client::hasChannel(void)
 {
     return (this->_currentChannel != NULL);

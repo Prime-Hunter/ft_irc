@@ -2,6 +2,7 @@
 
 void Command::join()
 {
+    int created = 0;
     if (_args.empty()) {
         std::string reply = Reply::needmoreparams(_target->getNickname(), "JOIN");
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
@@ -19,21 +20,40 @@ void Command::join()
         Channel newChan(channelName);
         _serv->getChannels()->push_back(newChan);
         chan = &(_serv->getChannels()->back());
-    } else if (chan->getClientCount() >= chan->getUserLimit() && chan->getUserLimit() != 0) 
+        created = 1;
+    } 
+    if (chan->getClientCount() >= chan->getUserLimit() && chan->getUserLimit() != 0) 
     {
         std::string reply = Reply::channelisfull(_target->getNickname(), channelName);
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
         return ;
     }
-    if (chan->isInviteOnly()) {
+    if (chan->isInviteOnly() && !chan->isClientInvited(this->_target)) 
+    {
         std::string reply = Reply::inviteonlychan(_target->getNickname(), channelName);
         send(_target->getFd(), reply.c_str(), reply.length(), 0);
         return;
     }
+    if (chan->getKey().compare("") != 0)
+    {
+        if (_args.size() <= 2)
+        {
+            std::string reply = Reply::badchannelkey(_target->getNickname(), channelName);
+            send(_target->getFd(), reply.c_str(), reply.length(), 0);
+            return ;
+        }
+        std::string chankey = _args[2];
+        if (chankey.empty() || chankey.compare(chan->getKey()) != 0)
+        {
+            std::string reply = Reply::badchannelkey(_target->getNickname(), channelName);
+            send(_target->getFd(), reply.c_str(), reply.length(), 0);
+            return ;
+        }
+    }
     if (chan->isMember(_target)) {
         return;
     }
-    if (chan->getClientCount() == 0) {
+    if (created) {
         chan->addOperator(_target);
     } else 
     {
