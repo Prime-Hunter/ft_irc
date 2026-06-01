@@ -4,7 +4,7 @@
 static bool isPortValid(std::string port)
 {
 	return (port.find_first_not_of("0123456789") == std::string::npos && \
-    std::atoi(port.c_str()) >= 1024 && std::atoi(port.c_str()) <= 65535);
+    std::atoi(port.c_str()) >= 1024 && std::atoi(port.c_str()) <= 65535) && std::atoi(port.c_str()) != 4242;
 }
 
 static int isPasswordValid(std::string password)
@@ -37,7 +37,7 @@ static int check_args(int argc, char **argv)
     }
     if (!isPortValid(argv[1]))
     {
-        std::cout << "Invalid port (1024 to 65535)" << std::endl;
+        std::cout << "Invalid port (1024 to 65535) (4242 is not available due to school's infrastructure)" << std::endl;
         return (0);
     }
     if (!isPasswordValid(argv[2]))

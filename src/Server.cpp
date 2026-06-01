@@ -6,11 +6,13 @@ bool Server::_signal = false;
 Server::Server(void) 
 {
     this->_socketFd = -1;
+    this->_bot = NULL;
 }
 
 Server::~Server()
 {
-    delete this->_bot;
+    if (this->_bot != NULL)
+        delete this->_bot;
 }
 
 Server::Server(Server const &copy)
