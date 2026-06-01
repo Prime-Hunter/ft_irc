@@ -249,11 +249,17 @@ void Server::startDccProxy(Client *sender, Client *receiver, const std::string &
     this->addPollFd(listenFd, POLLIN);
 
     std::string serverIp = this->getServerIp();
+    struct in_addr addr_tmp;
+    uint32_t serverIpNum = 0;
+    if (inet_aton(serverIp.c_str(), &addr_tmp) != 0)
+        serverIpNum = ntohl(addr_tmp.s_addr);
     std::ostringstream oss;
-    oss << "\001DCC SEND " << filename << " " << serverIp << " " << proxy.proxyPort << " " << fileSize << "\001";
+    oss << "\001DCC SEND " << filename << " " << serverIpNum << " " << proxy.proxyPort << " " << fileSize << "\001";
     std::string dccMsg = oss.str();
     std::string fullMsg = Reply::privmsg(sender->getPrefix(), receiver->getNickname(), dccMsg);
     send(receiver->getFd(), fullMsg.c_str(), fullMsg.length(), 0);
+
+    std::cout << "DCC proxy: advertised to receiver -> " << serverIp << ":" << proxy.proxyPort << " (file: " << filename << ")" << std::endl;
 }
 
 static bool isNumericIp(const std::string &ip)
@@ -319,7 +325,9 @@ void Server::handleDccEvent(int fd, short revents)
         senderAddr.sin_port = htons(proxy->senderPort);
         if (isNumericIp(proxy->senderIp))
         {
-            senderAddr.sin_addr.s_addr = static_cast<in_addr_t>(std::strtoul(proxy->senderIp.c_str(), NULL, 10));
+            uint32_t raw = static_cast<uint32_t>(std::strtoul(proxy->senderIp.c_str(), NULL, 10));
+            senderAddr.sin_addr.s_addr = htonl(raw);
+            std::cout << "DCC proxy: numeric sender IP string='" << proxy->senderIp << "' raw=" << raw << " resolved=" << inet_ntoa(senderAddr.sin_addr) << std::endl;
         }
         else
         {
@@ -330,9 +338,17 @@ void Server::handleDccEvent(int fd, short revents)
                 removeDccProxy(proxy - &this->_dccProxies[0]);
                 return;
             }
+            else
+            {
+                std::cout << "DCC proxy: resolved sender dotted IP=" << inet_ntoa(senderAddr.sin_addr) << std::endl;
+            }
         }
 
         int connectResult = connect(senderFd, (struct sockaddr *)&senderAddr, sizeof(senderAddr));
+        if (connectResult == -1)
+        {
+            std::cerr << "DCC proxy: connect() returned -1, errno=" << errno << " (" << strerror(errno) << ")\n";
+        }
         if (connectResult == -1 && errno != EINPROGRESS)
         {
             std::cerr << "DCC proxy: unable to connect to sender " << proxy->senderIp << ":" << proxy->senderPort << std::endl;
@@ -528,28 +544,37 @@ void Server::serverInit(int port, std::string password)
 		}
 		for(size_t i = 0; i < this->_fds.size(); i++)
 		{
-			if (this->_fds[i].revents & POLLIN)
-			{
-				if (this->_fds[i].fd == this->_socketFd)
-				{
+            short revents = this->_fds[i].revents;
+
+            if (revents & POLLIN)
+            {
+                if (this->_fds[i].fd == this->_socketFd)
+                {
                     try
                     {
-					    this->acceptClient();
+                        this->acceptClient();
                     }
                     catch (const std::runtime_error &e)
                     {
                         std::cout << "Error: " << e.what() << std::endl;
                     }
-				}
-				else if (this->getDccProxyByFd(this->_fds[i].fd) != NULL)
-				{
-					this->handleDccEvent(this->_fds[i].fd, this->_fds[i].revents);
-				}
-				else
-				{
-					this->newClientData(this->_fds[i].fd);
-				}
-			}
+                }
+                else if (this->getDccProxyByFd(this->_fds[i].fd) != NULL)
+                {
+                    this->handleDccEvent(this->_fds[i].fd, revents);
+                }
+                else
+                {
+                    this->newClientData(this->_fds[i].fd);
+                }
+            }
+
+            /* Also handle POLLOUT for DCC proxy fds so non-blocking connects
+               and pending flushes are processed. */
+            if ((revents & POLLOUT) && this->getDccProxyByFd(this->_fds[i].fd) != NULL)
+            {
+                this->handleDccEvent(this->_fds[i].fd, revents);
+            }
 		}
 	}
 }
